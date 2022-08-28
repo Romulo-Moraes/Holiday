@@ -62,7 +62,7 @@ typedef struct{
     int allCollectedPositionalArgumentsIndex;
 } argParserData;
 
-//
+
 
 /* Principals functions */
 argParserData argParserInit(int argc, char *argv[], char *programName, char *programAbout);
@@ -83,11 +83,11 @@ int checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *argumentNa
 char createNewShortArgumentName(argParserData *data);
 int pickupAllPositionalArguments(argParserData *data);
 void addPositionalArgumentInArray(argParserData *data, int *allCollectedPositionalArgumentBegin, int i);
-int pickupAllShortArgumentNames(argParserData *data);
+int pickupAllShortArgumentNames(argParserData *data, int *argvPosition);
 int checkIfOptionalArgumentIsRequired(argParserData *data, char *argument);
 int checkIfOptionalArgumentNeedValue(argParserData *data, char *argument);
 names getOppositeSizeOfArgumentName(argParserData *data, char *argumentName);
-int pickupAllLongArgumentNames(argParserData *data);
+int pickupAllLongArgumentNames(argParserData *data, int *argvPosition);
 neededPositionalArgument createNecessaryPositionalArgument(char *argumentID, char *helpMessage);
 neededOptionalArgument createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
 void controlDashesCountInLongArgumentName(char *argument, int isLongArgumentName);
