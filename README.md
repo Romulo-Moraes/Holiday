@@ -6,7 +6,7 @@
 
 
 ## What's that
-Holiday is an argument parser for C programming language, this support optional arguments, positional arguments and some salt in each one. The library is not complex to use and is divided in one header file that need just be included in your code, and some code files that need be pass to your compile
+Holiday is an argument parser for C programming language, this support optional arguments, positional arguments and some salt in each one. The library is not complex to use and is divided in one header file that need just be included in your code, and some code files that need be passed to your compiler
 
 ## Cross-platform
 This lib only use C standard libraries in its includes then you can use it on any platform. These is the used C standard libs:
