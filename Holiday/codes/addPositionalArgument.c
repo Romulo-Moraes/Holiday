@@ -1,5 +1,6 @@
 #include "./../Holiday.h"
 #include <string.h>
+#include <stdlib.h>
 
 /* This function will create a new require of arguments in argParserData struct, from there all arguments will be searched */
 void addPositionalArgument(argParserData *data, char *argumentID, char *helpMessage){
@@ -10,7 +11,8 @@ void addPositionalArgument(argParserData *data, char *argumentID, char *helpMess
 
     /* The argument ID should has at least two characters, with dashes not counting, if not, raise an "exception" */
     if(strlen(argumentIDWithMoreSpace) < 2){    
-        // TODO. crash !!!
+        puts("[Holiday log] Positional argument ID should has 2 characters or more, dashes don't count");
+        exit(0);
     }
 
     data->necessaryPositionalArguments[data->necessaryPositionalArgumentsIndex] = createNecessaryPositionalArgument(argumentIDWithMoreSpace, helpMessage);
