@@ -62,6 +62,7 @@ typedef struct{
     int allCollectedPositionalArgumentsIndex;
 } argParserData;
 
+//
 
 /* Principals functions */
 argParserData argParserInit(int argc, char *argv[], char *programName, char *programAbout);
