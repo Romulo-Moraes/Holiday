@@ -1,6 +1,4 @@
 #include "./../Holiday.h"
-#include <string.h>
-#include <stdlib.h>
 
 void parseArguments(argParserData *data, int enableBreak){
     int argvPosition = 1;

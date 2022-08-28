@@ -1,6 +1,4 @@
 #include "./../Holiday.h"
-#include <string.h>
-#include <stdlib.h>
 
 /* This function will create a new require of arguments in argParserData struct, from there all arguments will be searched */
 void addPositionalArgument(argParserData *data, char *argumentID, char *helpMessage){

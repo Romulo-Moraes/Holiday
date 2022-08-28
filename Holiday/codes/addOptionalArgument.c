@@ -1,7 +1,4 @@
-#include <string.h>
 #include "./../Holiday.h"
-#include <ctype.h>
-#include <stdlib.h>
 
 /* This function will create a new require of arguments in argParserData struct, from there all arguments will be searched */
 void addOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired){

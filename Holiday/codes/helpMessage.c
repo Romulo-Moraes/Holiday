@@ -1,7 +1,4 @@
 #include "./../Holiday.h"
-#include <stdlib.h>
-#include <string.h>
-
 
 void showHelpMessage(argParserData *data, int exitCode){
     int programAboutLength = strlen(data->programAbout);

@@ -1,5 +1,4 @@
 #include "./../Holiday.h"
-#include <string.h>
 
 
 char* getPositionalArgumentValue(argParserData *data, char *argumentID){
