@@ -51,6 +51,7 @@ int checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data){
     if(data->allCollectedPositionalArgumentsIndex == data->necessaryPositionalArgumentsIndex){
         return TRUE;
     }
+    
 
     return FALSE;
 }
@@ -64,7 +65,7 @@ int checkIfAllRequiredArgumentsWasGiven(argParserData *data){
         if(data->necessaryOptionalArguments[i].isRequired == TRUE){
 
             for(int j = 0; j < data->allCollectedOptionalArgumentsIndex; j++){
-                
+
                 if(strcmp(data->allCollectedOptionalArguments[j].longArgumentName, data->necessaryOptionalArguments[i].longArgumentName) == 0 || strcmp(data->allCollectedOptionalArguments[j].shortArgumentName, data->necessaryOptionalArguments[i].shortArgumentName) == 0){
                     found = TRUE;
                 }
@@ -106,7 +107,7 @@ int pickupAllPositionalArguments(argParserData *data){
 
             /* Check if the current argument is a short argument block */
             if(data->argv[i][0] == '-' && strncmp(data->argv[i], "--", 2) != 0){
-                sprintf(bufferOfFormat, "-%c", data->argv[i][strlen(data->argv[i] - 1)]);
+                sprintf(bufferOfFormat, "-%c", data->argv[i][strlen(data->argv[i]) - 1]);
 
                 /* Checking if the last flg of this block need a value */
                 if(checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
@@ -177,7 +178,6 @@ int pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
                 data->allCollectedOptionalArgumentsIndex += 1;
                 *argvPosition += 1;
 
-                return 0;
             }
             else{
                 return ARGUMENT_NOT_REQUIRED;
