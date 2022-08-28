@@ -11,10 +11,8 @@ Holiday is an argument parser for C programming language, this support optional 
 ## Cross-platform
 This lib only use C standard libraries in its includes then you can use it on any platform. These is the used C standard libs;
 <ul>
-    <li>malloc.h</li>
     <li>string.h</li>
     <li>stdlib.h</li>
-    <li>stdbool.h</li>
     <li>ctype.h</li>
 </ul>
 
@@ -26,19 +24,27 @@ Positional arguments is always required in program call, without it a crash is g
 
 
 ## How to use
-The Holiday has two ways to use, one using the default C functional way and another that try reach an OOP format.
+
 
 ### Including the Holiday
-Just download the file "Holiday.h" from the Holiday folder in file tree and include the file by just typing it on the first line of program.
+For better understanding of me and any person that will use this code, all functions are separated by your type, but the header file "Holiday.h" has the prototype of all of them, and somes structs/macros. Simulating that you copied the Holiday folder to current directory of main file of your program, just import the Holiday.h file with the command: 
 ```c
-#include "Holiday.h"
+#include "./Holiday/Holiday.h"
 ```
 
-### Using in functional way
-After including it you need to initialize a struct that will store all information about the Holiday, it need two arguments, argc and argv.
+### Compilation time
+All codes of Holiday lib are in Holiday/code, so to compile it you need to pass the entire code directory to the compiler, like in the following example that simulate as if Holiday folder is in current directory of main file of program, the main.c.
+
+```sh
+gcc main.c Holiday/codes/*.c -o main
+```
+
+
+### Using the Holiday
+After including it you need to initialize a struct that will store all information about the Holiday, it need mainly of two arguments, argc and argv. the 3° and 4° argParserInit argument is optional, but should be filled at least with empty string "". The 3° give a default name for your program, and ehd 4° give a about section for your program, both are displayed in help message if the user get stuck.
 
 ```c
-argParserData data = argParserInit(argc,argv);
+argParserData data = argParserInit(argc,argv, "calc", "Calculate two numbers given in program call");
 ```
 after initializing the argParserData struct you can start programming the required arguments in your program. You have two ways, the optional argument and the positional argument.
 
@@ -46,14 +52,14 @@ Optional way
 ```c
 // addOptionalArgument(<argParserData>, <long argument name>, <short argument name>, <if need value>, <a help that will showed if the user get stuck>>, <if this optional argument is required>);
 
-addOptionalArgument(&data, "--name", "-n", true, "Pass your name to program", false);
+addOptionalArgument(&data, "--name", "-n", TRUE, "Pass your name to program", FALSE);
 ```
 
 ### Optional way warnings !!!
 
-The lib will always fix the full optional name or short optional name if them are wrong, like pass just "name" to full optional name, that should be "--name". Following this same idea, the name of short optional flag will be changed if already has a short flag with this name, it will change the case, and if even the case changed already has a flag with this name, a random character will be picked up, and if it fail again, a message is given on terminal and a exit(1) is called. The lib can't do it with full optional name, because this, if two full optional names are the same, a message is given on terminal and a exit(1) is called.
+The lib will always fix the full optional name or short optional name if them are wrong, like pass just "name" to full optional name, that should be "--name". Following this same idea, the name of short optional flag will be changed if already has a short flag with this name, it will change the case, and if even the case changed already has a flag with this name, a random character will be picked up, and if it fail again, a message is given on terminal and a exit is called. The lib can't do it with full optional name, if two full optional names are the same, a message is given on terminal and a exit is called.
 
-addPositionArgument function has a min/max size for full optional name and short optional name, and the program crash if not followed. The min size of full optional name is 2 characters beyond "--", and the min size of short optional name is 1, that is the same value for the max value. If the program crash, a log will be given to you know what happened.
+addOptionalArgument function has a min/max size for full optional name and short optional name, and the program crash if not followed. The min size of full optional name is 2 characters beyond "--", and the min size of short optional name is 1, that is the same value for the max value. If the program crash, a log will be given to you know what happened.
 
 Positional way
 ```c
@@ -83,37 +89,70 @@ Checking if an optional argument was triggered
 optionalWasSet(data, "-n");
 ```
 
-Getting a value from arguments
+Getting a value from optional arguments
 ```c
 // getArgumentValue(<argParserData>, <flag to get>);
 
 
 // This function return a string
-getArgumentValue(&data, "--name");
+getOptionalArgumentValue(&data, "--name");
+```
+
+Getting a value from positional arguments
+```c
+// getArgumentValue(<argParserData>, <ID to get>);
+
+
+// This function return a string
+getPositionalArgumentValue(&data, "age");
 ```
 
 This is a functional program with this library, using all functions above
 ```c
 #include <stdio.h>
-#include "Holiday.h"
+#include "Holiday2/Holiday/Holiday.h"
+#include <stdlib.h>
 
-int main(int argc, char **argv){
-    argParserData data = argParserInit(argc,argv);
+int main(int argc, char *argv[])
+{
+    int number1, number2;
+    argParserData data = argParserInit(argc, argv, "calc", "Calculate two numbers given in program call");
 
-    addOptionalArgument(&data, "--name", "-n", true, "Pass your name to program", false);
-    addPositionalArgument(&data, "age", "Pass your age to program");
-    
-    parseArguments(&data, true);
+    addOptionalArgument(&data, "--operation", "-o", TRUE, "Math operator", FALSE);
+    addPositionalArgument(&data, "number1", "Pass the first number");
+    addPositionalArgument(&data, "number2", "Pass the second number");
+
+    parseArguments(&data, TRUE);
+
+    number1 = atoi(getPositionalArgumentValue(&data, "number1"));
+    number2 = atoi(getPositionalArgumentValue(&data, "number2"));
 
 
-    if(optionalWasSet(data, "-n")){
-        printf("Your name is: %s\n", getArgumentValue(&data, "-n"));
+    if (optionalWasSet(&data, "--operation") == TRUE)
+    {
+        switch (getOptionalArgumentValue(&data, "--operation")[0])
+        {
+        case '-':
+            printf("%d\n", number1 - number2);
+            break;
+        case '+':
+            printf("%d\n", number1 + number2);
+            break;
+        case '/':
+            printf("%d\n", number1 / number2);
+            break;
+        case '*':
+            printf("%d\n", number1 * number2);
+            break;
+        default:
+            puts("Unknow operation");
+            break;
+        }
     }
-    else{
-        printf("Your name i don't know, but ");
+    else
+    {
+        puts("Can't do the calculation without the operator");
     }
-
-    printf("your age is %s\n", getArgumentValue(&data, "age"));
 
     return 0;
 }
@@ -121,30 +160,29 @@ int main(int argc, char **argv){
 
 Inputs / Outputs
 ```sh
-./main 23 --name "Roberto"
+./main 10 20 --operation "*"
+200
 
-Your name is: Roberto
-your age is 23
+./main 10 -o "-" 20
+-10
 
-
-./main --name "Carlinhos" 43
-
-Your name is: Carlinhos
-your age is 43
-
-
-./main 18
-
-Your name i dont know, but your age is 18
+./main --operation "+" 10 20
+30
 ```
 
-## Struct as a class
-If you don't like the functions that is spread around the code, you can use it from a struct, the function argParserFunctions() do it very well, and return a struct of type argParser.
+Note: the character '*' is interpreted different of just a symbol, to terminal it's all files in directory, then it need be pass with quotes.
 
-```c
-argParserData data = argParserInit(argc,argv);
-argParser parser = argParserFunctions();
+
+Error message if just one or no one number is passed
+```txt
+calc --> How to use the program
+
+calc <[Positional arguments]> --<[Optional argument]> or -<[Short optional argument]> <[Short optional argument value]>
+About: Calculate two numbers given in program call
+
+number1 --> Pass the first number (required)
+number2 --> Pass the second number (required)
+--operation / -o --> Math operator 
+
+End of help message
 ```
-after it all functions that can be used of library is available in that struct, some editors can show your symbols as a variable in intellisense, but all of them is callable.
-
-<img src="./assets/CodeImage.png">
