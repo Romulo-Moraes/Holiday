@@ -192,3 +192,6 @@ End of help message
 Holiday can handle negative numbers, for both type of arguments, optional and positional.
 
 Any value that comes after a long argument name will become a value if that long argument requires a value, then negative numbers to long argument names isn't a problem. Negative numbers is almost equal to short argument name, except that negative numbers only has numbers beyond the first dash. The short argument name filter will let the argument go away if there only has numbers after the dash, and will be catch up in positional argument filter.
+
+### Names for arguments
+Like in variable names, argument names of optional and positional types can't start with a numeric character, a warning message will be displayed in terminal and exit will be called.
