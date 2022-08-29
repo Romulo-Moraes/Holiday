@@ -71,7 +71,7 @@ addPositionalArgument(&data, "age", "Pass your age to program");
 
 ### Positional way warnings !!!
 
-Like in optional way, here the lib will always try fix some argument that you required for your program, like require "--name" that should be just "name" in this feature. Positional arguments need a min value, anything greater than 0 is good. Characters like "-" doesn't count if they are in string begin.
+Like in optional way, here the lib will always try fix some argument that you required for your program, like require "--name" that should be just "name" in this feature. Positional arguments need a min value length, anything greater or equal than 2 characters is good. Characters like "-" doesn't count if they are in string begin.
 
 Parsing
 ```c
