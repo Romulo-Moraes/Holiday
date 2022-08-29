@@ -95,7 +95,7 @@ Getting a value from optional arguments
 // getArgumentValue(<argParserData>, <flag to get>);
 
 
-// This function return a string
+// This function return a string or NULL if not found
 getOptionalArgumentValue(&data, "--name");
 ```
 
@@ -104,7 +104,7 @@ Getting a value from positional arguments
 // getArgumentValue(<argParserData>, <ID to get>);
 
 
-// This function return a string
+// This function return a string or NULL if not found
 getPositionalArgumentValue(&data, "age");
 ```
 
