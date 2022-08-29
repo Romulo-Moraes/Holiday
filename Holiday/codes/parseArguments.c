@@ -104,7 +104,7 @@ int pickupAllPositionalArguments(argParserData *data){
         else{
 
             /* Check if the current argument is a short argument block */
-            if(data->argv[i][0] == '-' && strncmp(data->argv[i], "--", 2) != 0){
+            if(data->argv[i][0] == '-' && strncmp(data->argv[i], "--", 2) != 0 && checkIfArgumentIsNumeric(&data->argv[i][1]) == FALSE){
                 sprintf(bufferOfFormat, "-%c", data->argv[i][strlen(data->argv[i]) - 1]);
 
                 /* Checking if the last flg of this block need a value */
@@ -145,46 +145,66 @@ int pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
 
     /* If the first char of string is a dash but the two first isn't dashes, then it is a short argument block */
     if(data->argv[currentArgvPosition][0] == '-' && strncmp(data->argv[currentArgvPosition], "--", 2) != 0){
-        for(int j = 1; j < strlen(data->argv[currentArgvPosition]); j++){
-            sprintf(bufferOfFormat, "-%c", data->argv[currentArgvPosition][j]);
-            if(checkIfOptionalArgumentIsRequired(data, bufferOfFormat) == TRUE){
-                if(checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
+        if(checkIfArgumentIsNumeric(&data->argv[currentArgvPosition][1]) == FALSE){
+            for(int j = 1; j < strlen(data->argv[currentArgvPosition]); j++){
+                sprintf(bufferOfFormat, "-%c", data->argv[currentArgvPosition][j]);
+                if(checkIfOptionalArgumentIsRequired(data, bufferOfFormat) == TRUE){
+                    if(checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
 
-                    /* -1 represent the last char of string*/
-                    if(j == strlen(data->argv[currentArgvPosition]) - 1){
-                        if(currentArgvPosition + 1 < data->argc){
-                            data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].needValue = TRUE;
-                            data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].value = data->argv[currentArgvPosition + 1];
+                        /* -1 represent the last char of string*/
+                        if(j == strlen(data->argv[currentArgvPosition]) - 1){
+                            if(currentArgvPosition + 1 < data->argc){
+                                data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].needValue = TRUE;
+                                data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].value = data->argv[currentArgvPosition + 1];
 
-                            /* This addition will be added to the addition right down here to jump through the optional value */
-                            *argvPosition += 1;
+                                /* This addition will be added to the addition right down here to jump through the optional value */
+                                *argvPosition += 1;
+                            }
+                            else{
+                                return ARGUMENT_WITHOUT_VALUE;
+                            }
                         }
                         else{
                             return ARGUMENT_WITHOUT_VALUE;
                         }
                     }
-                    else{
-                        return ARGUMENT_WITHOUT_VALUE;
-                    }
+
+                    argumentNames = getOppositeSizeOfArgumentName(data, bufferOfFormat);
+
+                    strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].longArgumentName, argumentNames.longArgumentName);
+                    strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].shortArgumentName, argumentNames.shortArgumentName);
+
+                    data->allCollectedOptionalArgumentsIndex += 1;
+                    *argvPosition += 1;
+
                 }
-
-                argumentNames = getOppositeSizeOfArgumentName(data, bufferOfFormat);
-
-                strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].longArgumentName, argumentNames.longArgumentName);
-                strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].shortArgumentName, argumentNames.shortArgumentName);
-
-                data->allCollectedOptionalArgumentsIndex += 1;
-                *argvPosition += 1;
-
-            }
-            else{
-                return ARGUMENT_NOT_REQUIRED;
+                else{
+                    return ARGUMENT_NOT_REQUIRED;
+                }
             }
         }
+
     }
     
     *argvPosition += 1;
     return 0;
+}
+
+int checkIfArgumentIsNumeric(char *argument){
+    int isNumeric = TRUE;
+    short argumentLength = strlen(argument);
+    int i = 0;
+
+    while(i < argumentLength && isNumeric == TRUE){
+        if(!isdigit(argument[i])){
+            isNumeric = FALSE;
+        }
+
+        i++;
+    }
+
+
+    return isNumeric;
 }
 
 

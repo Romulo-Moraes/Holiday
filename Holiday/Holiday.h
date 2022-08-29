@@ -76,7 +76,7 @@ int optionalWasSet(argParserData *data, char *argumentName);
 char* getOptionalArgumentValue(argParserData *data, char *argumentName);
 char* getPositionalArgumentValue(argParserData *data, char *argumentID);
 
-
+int checkIfArgumentIsNumeric(char *argument);
 int checkIfUnknowArgumentsWasPassedToProgram(argParserData *data);
 int checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data);
 int checkIfAllRequiredArgumentsWasGiven(argParserData *data);
