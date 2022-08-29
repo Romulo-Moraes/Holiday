@@ -13,6 +13,11 @@ void addPositionalArgument(argParserData *data, char *argumentID, char *helpMess
         exit(0);
     }
 
+    if(isdigit(argumentIDWithMoreSpace[0])){
+        puts("[Holiday log] The first character of positional argument ID shouldn't be a number");
+        exit(0);
+    }
+
     data->necessaryPositionalArguments[data->necessaryPositionalArgumentsIndex] = createNecessaryPositionalArgument(argumentIDWithMoreSpace, helpMessage);
     data->necessaryPositionalArgumentsIndex += 1;
 }

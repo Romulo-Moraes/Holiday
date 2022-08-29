@@ -32,6 +32,16 @@ void addOptionalArgument(argParserData *data, char *longArgumentName, char *shor
         exit(0);
     }
 
+    if(isdigit(longArgumentNameWithMoreSpace[2])){
+        puts("[Holiday log] The first character of long argument name shouldn't be a number");
+        exit(0);
+    }
+
+    if(isdigit(shortArgumentNameWithMoreSpace[1])){
+        puts("[Holiday log] The short optional name shouldn't be a number");
+        exit(0);
+    }
+
     if(checkIfShortArgumentNameWasAlreadyGiven(data, shortArgumentNameWithMoreSpace) == TRUE){
         shortArgumentNameWithMoreSpace[1] = isupper(shortArgumentNameWithMoreSpace[1]) ? tolower(shortArgumentNameWithMoreSpace[1]) : toupper(shortArgumentNameWithMoreSpace[1]);
 
