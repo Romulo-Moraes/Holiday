@@ -18,18 +18,18 @@ void addOptionalArgument(argParserData *data, char *longArgumentName, char *shor
 
     /* long argument names should has more than 2 characters of length beyond the two dashes, if not, raise a "exception" */
     if(HOLIDAY__retrieveArgumentNameSize(longArgumentName) < 2){
-        puts("[Holiday log] Long argument names should has two or more characters in its name, beyond the dashes");
+        puts("[Holiday log] Long argument names should have two or more characters in its names, beyond the dashes");
         exit(DEBUG_ERROR_CODE);
     }
 
     /* long argument names should has only 1 character of length beyond the one dashe, if not, raise a "exception" */
     if(HOLIDAY__retrieveArgumentNameSize(shortArgumentName) != 1){
-        puts("[Holiday log] Short argument names should has only one character in its name, beyond the dash");
+        puts("[Holiday log] Short argument names should have only one character in its name, beyond the dash");
         exit(DEBUG_ERROR_CODE);
     }
 
     if(HOLIDAY__checkIfLongNameArgumentWasAlreadyGiven(data, longArgumentName) == TRUE){
-        puts("[Holiday log] Long argument name already required by the programmer");
+         printf("[Holiday log] Long argument name conflict, this name was used 2 times: %s\n", longArgumentName);
         exit(DEBUG_ERROR_CODE);
     }
 

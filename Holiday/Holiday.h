@@ -97,4 +97,4 @@ HOLIDAY__neededPositionalArgument HOLIDAY__createNecessaryPositionalArgument(cha
 HOLIDAY__neededOptionalArgument HOLIDAY__createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
 int HOLIDAY__dashesChecking(char *argument, int isLongArgumentName, int *dashesInBeginOutput);
 int HOLIDAY__retrieveArgumentNameSize(char *argument);
-void HOLIDAY__removeDashesFromPositionalArgument(char *argument, int argumentBufferSize);
+void HOLIDAY__checkDashesInStringBeginning(char *buffer);

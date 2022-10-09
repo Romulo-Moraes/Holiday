@@ -57,9 +57,6 @@ addOptionalArgument(&data, "--name", "-n", TRUE, "Pass your name to program", FA
 ```
 
 ### Optional way warnings !!!
-
-The lib will always fix the full optional name or short optional name if them are wrong, like pass just "name" to full optional name, that should be "--name". Following this same idea, the name of short optional flag will be changed if already has a short flag with this name, it will change the case, and if even the case changed already has a flag with this name, a random character will be picked up, and if it fail again, a message is given on terminal and a exit is called. The lib can't do it with full optional name, if two full optional names are the same, a message is given on terminal and a exit is called.
-
 addOptionalArgument function has a min/max size for full optional name and short optional name, and the program crash if not followed. The min size of full optional name is 2 characters beyond "--", and the min size of short optional name is 1, that is the same value for the max value. If the program crash, a log will be given to you know what happened.
 
 Positional way
@@ -70,8 +67,7 @@ addPositionalArgument(&data, "age", "Pass your age to program");
 ```
 
 ### Positional way warnings !!!
-
-Like in optional way, here the lib will always try fix some argument that you required for your program, like require "--name" that should be just "name" in this feature. Positional arguments need a min value length, anything greater or equal than 2 characters is good. Characters like "-" doesn't count if they are in string begin.
+Positional arguments need a min value length, anything greater or equal than 2 characters is good.
 
 Parsing
 ```c
@@ -194,4 +190,4 @@ Holiday can handle negative numbers, for both type of arguments, optional and po
 Any value that comes after a long/short argument name will become a value if that long argument requires a value, then negative numbers to long argument names isn't a problem. Negative numbers is almost equal to short argument name, except that negative numbers only has numbers beyond the first dash. The short argument name filter will let the argument go away if there only has numbers after the dash, and will be catch up in positional argument filter.
 
 ### Names for arguments
-Like in variable names, argument names of optional and positional types can't start with a numeric character, a warning message will be displayed in terminal and exit will be called.
+Like in variable names, argument names of optional and positional types can't start with a numeric character, if that happens, a warning message will be displayed in terminal and exit will be called.
