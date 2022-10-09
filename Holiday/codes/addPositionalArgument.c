@@ -5,7 +5,7 @@ void addPositionalArgument(argParserData *data, char *argumentID, char *helpMess
     char argumentIDWithMoreSpace[256] = {0};
 
     strcpy(argumentIDWithMoreSpace, argumentID);
-    removeDashesFromPositionalArgument(argumentIDWithMoreSpace, sizeof(argumentIDWithMoreSpace));
+    HOLIDAY__removeDashesFromPositionalArgument(argumentIDWithMoreSpace, sizeof(argumentIDWithMoreSpace));
 
     /* The argument ID should has at least two characters, with dashes not counting, if not, raise an "exception" */
     if(strlen(argumentIDWithMoreSpace) < 2){    
@@ -18,13 +18,13 @@ void addPositionalArgument(argParserData *data, char *argumentID, char *helpMess
         exit(DEBUG_ERROR_CODE);
     }
 
-    data->necessaryPositionalArguments[data->necessaryPositionalArgumentsIndex] = createNecessaryPositionalArgument(argumentIDWithMoreSpace, helpMessage);
+    data->necessaryPositionalArguments[data->necessaryPositionalArgumentsIndex] = HOLIDAY__createNecessaryPositionalArgument(argumentIDWithMoreSpace, helpMessage);
     data->necessaryPositionalArgumentsIndex += 1;
 }
 
 /* This function help to create a positional argument requirement most easier */
-neededPositionalArgument createNecessaryPositionalArgument(char *argumentID, char *helpMessage){
-    neededPositionalArgument argument;
+HOLIDAY__neededPositionalArgument HOLIDAY__createNecessaryPositionalArgument(char *argumentID, char *helpMessage){
+    HOLIDAY__neededPositionalArgument argument;
 
     strcpy(argument.argumentID, argumentID);    
     strcpy(argument.helpMessage, helpMessage);
@@ -33,7 +33,7 @@ neededPositionalArgument createNecessaryPositionalArgument(char *argumentID, cha
 }
 
 /* This function will remove any dashes on the begin of a string, if has any */
-void removeDashesFromPositionalArgument(char *argument, int argumentBufferSize){
+void HOLIDAY__removeDashesFromPositionalArgument(char *argument, int argumentBufferSize){
     char midwayBuffer[256] = {0};
     int i = 0;
 

@@ -4,26 +4,26 @@ void parseArguments(argParserData *data, int possibleErrorCode){
     int argvPosition = 1;
 
     while(argvPosition < data->argc){
-        if(pickupAllLongArgumentNames(data, &argvPosition) == 0){
+        if(HOLIDAY__pickupAllLongArgumentNames(data, &argvPosition) == 0){
             if(argvPosition < data->argc){
-                if(pickupAllShortArgumentNames(data, &argvPosition) != 0){
-                    showHelpMessage(data, possibleErrorCode);
+                if(HOLIDAY__pickupAllShortArgumentNames(data, &argvPosition) != 0){
+                    HOLIDAY__showHelpMessage(data, possibleErrorCode);
                 }    
             }
             
         }
         else{
-            showHelpMessage(data, possibleErrorCode);
+            HOLIDAY__showHelpMessage(data, possibleErrorCode);
         }
     }
 
     /* This if case is executed in sequence and if any error is reported from any process the program show the help message and exit */
-    if(pickupAllPositionalArguments(data) != 0 || checkIfAllRequiredArgumentsWasGiven(data) == 0 || checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
-        showHelpMessage(data, possibleErrorCode);
+    if(HOLIDAY__pickupAllPositionalArguments(data) != 0 || HOLIDAY__checkIfAllRequiredArgumentsWasGiven(data) == 0 || HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
+        HOLIDAY__showHelpMessage(data, possibleErrorCode);
     }
 }
 
-int checkIfUnknowArgumentsWerePassedToProgram(argParserData *data){
+int HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(argParserData *data){
     int found = FALSE;
 
     /* The strategy here is run the collected array and compare if each element exists in the necessary array */
@@ -45,7 +45,7 @@ int checkIfUnknowArgumentsWerePassedToProgram(argParserData *data){
     return FALSE;
 }
 
-int checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data){
+int HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data){
     if(data->allCollectedPositionalArgumentsIndex == data->necessaryPositionalArgumentsIndex){
         return TRUE;
     }
@@ -54,7 +54,7 @@ int checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data){
     return FALSE;
 }
 
-int checkIfAllRequiredArgumentsWasGiven(argParserData *data){
+int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data){
     int found = FALSE;
 
     /* The strategy here is run the necessary array and compare if each element exists in collected array */
@@ -83,7 +83,7 @@ int checkIfAllRequiredArgumentsWasGiven(argParserData *data){
 
 /* This function will run through the entire argv and check which argument one is a positional argument,
    but to do that all optional arguments need be verified before */
-int pickupAllPositionalArguments(argParserData *data){
+int HOLIDAY__pickupAllPositionalArguments(argParserData *data){
     char bufferOfFormat[3] = {0};
     int allCollectedPositionalArgumentBegin = 0;
 
@@ -95,7 +95,7 @@ int pickupAllPositionalArguments(argParserData *data){
         if(strncmp(data->argv[i], "--", 2) == 0){
 
             /* If long argument need a value, then the current and the next argument can't be a positional argument */
-            if(checkIfOptionalArgumentNeedValue(data, data->argv[i]) == TRUE){
+            if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, data->argv[i]) == TRUE){
 
                 /* Advance the argv index to next position that will be advanced by the for loop too */
                 i += 1;
@@ -104,11 +104,11 @@ int pickupAllPositionalArguments(argParserData *data){
         else{
 
             /* Check if the current argument is a short argument block */
-            if(data->argv[i][0] == '-' && strncmp(data->argv[i], "--", 2) != 0 && checkIfArgumentIsNumeric(&data->argv[i][1]) == FALSE){
+            if(data->argv[i][0] == '-' && strncmp(data->argv[i], "--", 2) != 0 && HOLIDAY__checkIfArgumentIsNumeric(&data->argv[i][1]) == FALSE){
                 sprintf(bufferOfFormat, "-%c", data->argv[i][strlen(data->argv[i]) - 1]);
 
                 /* Checking if the last flg of this block need a value */
-                if(checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
+                if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
 
                     /* Advance the argv index to next position that will be advanced by the for loop too */
                     i += 1;
@@ -117,7 +117,7 @@ int pickupAllPositionalArguments(argParserData *data){
             else{
 
                 /* If no one of options above was triggered, then the current argument is positional */
-                addPositionalArgumentInArray(data, &allCollectedPositionalArgumentBegin, i);
+                HOLIDAY__addPositionalArgumentInArray(data, &allCollectedPositionalArgumentBegin, i);
             }
         }
     }
@@ -125,7 +125,7 @@ int pickupAllPositionalArguments(argParserData *data){
     return 0;
 }
 
-void addPositionalArgumentInArray(argParserData *data, int *allCollectedPositionalArgumentBegin, int i){
+void HOLIDAY__addPositionalArgumentInArray(argParserData *data, int *allCollectedPositionalArgumentBegin, int i){
     strcpy(data->allCollectedPositionalArguments[*allCollectedPositionalArgumentBegin].argumentID, data->necessaryPositionalArguments[*allCollectedPositionalArgumentBegin].argumentID);
 
     data->allCollectedPositionalArguments[*allCollectedPositionalArgumentBegin].value = data->argv[i];
@@ -136,7 +136,7 @@ void addPositionalArgumentInArray(argParserData *data, int *allCollectedPosition
 
 /* This function will load everything that is long argument from argv, right into allCollectedOptionalArguments array.
    This version is for short argument name */
-int pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
+int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
     names argumentNames;
     char bufferOfFormat[3] = {0};
     int currentArgvPosition = *argvPosition;
@@ -145,11 +145,11 @@ int pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
 
     /* If the first char of string is a dash but the two first isn't dashes, then it is a short argument block */
     if(data->argv[currentArgvPosition][0] == '-' && strncmp(data->argv[currentArgvPosition], "--", 2) != 0){
-        if(checkIfArgumentIsNumeric(&data->argv[currentArgvPosition][1]) == FALSE){
+        if(HOLIDAY__checkIfArgumentIsNumeric(&data->argv[currentArgvPosition][1]) == FALSE){
             for(int j = 1; j < strlen(data->argv[currentArgvPosition]); j++){
                 sprintf(bufferOfFormat, "-%c", data->argv[currentArgvPosition][j]);
-                if(checkIfOptionalArgumentIsRequired(data, bufferOfFormat) == TRUE){
-                    if(checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
+                if(HOLIDAY__checkIfOptionalArgumentIsRequired(data, bufferOfFormat) == TRUE){
+                    if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
 
                         /* -1 represent the last char of string*/
                         if(j == strlen(data->argv[currentArgvPosition]) - 1){
@@ -169,7 +169,7 @@ int pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
                         }
                     }
 
-                    argumentNames = getOppositeSizeOfArgumentName(data, bufferOfFormat);
+                    argumentNames = HOLIDAY__getOppositeSizeOfArgumentName(data, bufferOfFormat);
 
                     strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].longArgumentName, argumentNames.longArgumentName);
                     strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].shortArgumentName, argumentNames.shortArgumentName);
@@ -190,7 +190,7 @@ int pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
     return 0;
 }
 
-int checkIfArgumentIsNumeric(char *argument){
+int HOLIDAY__checkIfArgumentIsNumeric(char *argument){
     int isNumeric = TRUE;
     short argumentLength = strlen(argument);
     int i = 0;
@@ -219,7 +219,7 @@ int checkIfArgumentIsNumeric(char *argument){
 
 /* This function will load everything that is long argument from argv, right into allCollectedOptionalArguments array.
    This version is for long argument name */
-int pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
+int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
     names argumentNames;
     int currentArgvPosition = *argvPosition;
 
@@ -229,10 +229,10 @@ int pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
     if(strncmp(data->argv[currentArgvPosition], "--", 2) == 0){
 
         /* Checking if the found argument is required by the programmer */
-        if(checkIfOptionalArgumentIsRequired(data, data->argv[currentArgvPosition]) == TRUE){
+        if(HOLIDAY__checkIfOptionalArgumentIsRequired(data, data->argv[currentArgvPosition]) == TRUE){
 
             /* Checking if the found argument need a value with it */
-            if(checkIfOptionalArgumentNeedValue(data, data->argv[currentArgvPosition]) == TRUE){
+            if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, data->argv[currentArgvPosition]) == TRUE){
                 if(currentArgvPosition + 1 < data->argc){
                     data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].needValue = TRUE;
                     data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].value = data->argv[currentArgvPosition + 1];
@@ -245,7 +245,7 @@ int pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
                 }
             }
 
-            argumentNames = getOppositeSizeOfArgumentName(data, data->argv[currentArgvPosition]);
+            argumentNames = HOLIDAY__getOppositeSizeOfArgumentName(data, data->argv[currentArgvPosition]);
                 
             strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].longArgumentName, argumentNames.longArgumentName);
             strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].shortArgumentName, argumentNames.shortArgumentName);
@@ -264,7 +264,7 @@ int pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
 }
 
 
-names getOppositeSizeOfArgumentName(argParserData *data, char *argumentName){
+names HOLIDAY__getOppositeSizeOfArgumentName(argParserData *data, char *argumentName){
     names argumentNames;
 
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
@@ -279,7 +279,7 @@ names getOppositeSizeOfArgumentName(argParserData *data, char *argumentName){
 
 
 /* This function will check if a optional argument need a value after it */
-int checkIfOptionalArgumentNeedValue(argParserData *data, char *argument){
+int HOLIDAY__checkIfOptionalArgumentNeedValue(argParserData *data, char *argument){
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
 
         /* It's right that in some time this "if" will be true, but in the end has a return just to compiler be happy */
@@ -292,7 +292,7 @@ int checkIfOptionalArgumentNeedValue(argParserData *data, char *argument){
 }
 
 /* Check if a argument was declared in code, if found in array of necessaries it was declared */
-int checkIfOptionalArgumentIsRequired(argParserData *data, char *argument){
+int HOLIDAY__checkIfOptionalArgumentIsRequired(argParserData *data, char *argument){
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
         if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argument) == 0 || strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argument) == 0){
             return TRUE;

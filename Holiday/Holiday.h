@@ -29,13 +29,13 @@ typedef struct{
     char longArgumentName[DEFAULT_ARRAY_SIZE];
     char shortArgumentName[3];
     char *value;
-} collectedOptionalArgument;
+} HOLIDAY__collectedOptionalArgument;
 
 /* This struct will store all arguments that are collected from argv after processed, it is for positional type*/
 typedef struct{
     char argumentID[DEFAULT_ARRAY_SIZE];
     char *value;
-} collectedPositionalArgument;
+} HOLIDAY__collectedPositionalArgument;
 
 /* This struct is used to store all information that addOptionalArgument function will get */
 typedef struct{
@@ -44,23 +44,23 @@ typedef struct{
     int needValue;
     int isRequired;
     char helpMessage[DEFAULT_ARRAY_SIZE];
-} neededOptionalArgument;
+} HOLIDAY__neededOptionalArgument;
 
 /* This struct is used to store all information that addPositionalArgument function will get */
 typedef struct{
     char argumentID[DEFAULT_ARRAY_SIZE];
     char helpMessage[DEFAULT_ARRAY_SIZE];
-} neededPositionalArgument;
+} HOLIDAY__neededPositionalArgument;
 
 typedef struct{
     int argc;
     char **argv;
     char programName[DEFAULT_ARRAY_SIZE];
     char programAbout[DEFAULT_ARRAY_SIZE];  
-    neededPositionalArgument necessaryPositionalArguments[DEFAULT_ARRAY_SIZE];
-    neededOptionalArgument necessaryOptionalArguments[DEFAULT_ARRAY_SIZE];
-    collectedOptionalArgument allCollectedOptionalArguments[DEFAULT_ARRAY_SIZE];
-    collectedPositionalArgument allCollectedPositionalArguments[DEFAULT_ARRAY_SIZE];
+    HOLIDAY__neededPositionalArgument necessaryPositionalArguments[DEFAULT_ARRAY_SIZE];
+    HOLIDAY__neededOptionalArgument necessaryOptionalArguments[DEFAULT_ARRAY_SIZE];
+    HOLIDAY__collectedOptionalArgument allCollectedOptionalArguments[DEFAULT_ARRAY_SIZE];
+    HOLIDAY__collectedPositionalArgument allCollectedPositionalArguments[DEFAULT_ARRAY_SIZE];
     int necessaryPositionalArgumentsIndex;
     int necessaryOptionalArgumentsIndex;
     int allCollectedOptionalArgumentsIndex;
@@ -73,28 +73,28 @@ typedef struct{
 argParserData argParserInit(int argc, char *argv[], char *programName, char *programAbout);
 void addOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
 void addPositionalArgument(argParserData *data, char *argumentID, char *helpMessage);
-void parseArguments(argParserData *data, int enableBreak);
+void parseArguments(argParserData *data, int possibleErrorCode);
 int optionalWasSet(argParserData *data, char *argumentName);
 char* getOptionalArgumentValue(argParserData *data, char *argumentName);
 char* getPositionalArgumentValue(argParserData *data, char *argumentID);
 
-int checkIfArgumentIsNumeric(char *argument);
-int checkIfUnknowArgumentsWerePassedToProgram(argParserData *data);
-int checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data);
-int checkIfAllRequiredArgumentsWasGiven(argParserData *data);
-void showHelpMessage(argParserData *data, int exitCode);
-int checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *argumentName);
-int checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *argumentName);
-char createNewShortArgumentName(argParserData *data);
-int pickupAllPositionalArguments(argParserData *data);
-void addPositionalArgumentInArray(argParserData *data, int *allCollectedPositionalArgumentBegin, int i);
-int pickupAllShortArgumentNames(argParserData *data, int *argvPosition);
-int checkIfOptionalArgumentIsRequired(argParserData *data, char *argument);
-int checkIfOptionalArgumentNeedValue(argParserData *data, char *argument);
-names getOppositeSizeOfArgumentName(argParserData *data, char *argumentName);
-int pickupAllLongArgumentNames(argParserData *data, int *argvPosition);
-neededPositionalArgument createNecessaryPositionalArgument(char *argumentID, char *helpMessage);
-neededOptionalArgument createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
-int dashesChecking(char *argument, int isLongArgumentName, int *dashesInBeginOutput);
-int retrieveArgumentNameSize(char *argument);
-void removeDashesFromPositionalArgument(char *argument, int argumentBufferSize);
+int HOLIDAY__checkIfArgumentIsNumeric(char *argument);
+int HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(argParserData *data);
+int HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data);
+int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data);
+void HOLIDAY__showHelpMessage(argParserData *data, int exitCode);
+int HOLIDAY__checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *argumentName);
+int HOLIDAY__checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *argumentName);
+char HOLIDAY__createNewShortArgumentName(argParserData *data);
+int HOLIDAY__pickupAllPositionalArguments(argParserData *data);
+void HOLIDAY__addPositionalArgumentInArray(argParserData *data, int *allCollectedPositionalArgumentBegin, int i);
+int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition);
+int HOLIDAY__checkIfOptionalArgumentIsRequired(argParserData *data, char *argument);
+int HOLIDAY__checkIfOptionalArgumentNeedValue(argParserData *data, char *argument);
+names HOLIDAY__getOppositeSizeOfArgumentName(argParserData *data, char *argumentName);
+int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition);
+HOLIDAY__neededPositionalArgument HOLIDAY__createNecessaryPositionalArgument(char *argumentID, char *helpMessage);
+HOLIDAY__neededOptionalArgument HOLIDAY__createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
+int HOLIDAY__dashesChecking(char *argument, int isLongArgumentName, int *dashesInBeginOutput);
+int HOLIDAY__retrieveArgumentNameSize(char *argument);
+void HOLIDAY__removeDashesFromPositionalArgument(char *argument, int argumentBufferSize);

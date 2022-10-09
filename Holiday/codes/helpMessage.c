@@ -1,6 +1,6 @@
 #include "./../Holiday.h"
 
-void showHelpMessage(argParserData *data, int exitCode){
+void HOLIDAY__showHelpMessage(argParserData *data, int exitCode){
     int programAboutLength = strlen(data->programAbout);
 
     printf("%s --> How to use the program\n\n", strlen(data->programName) > 0 ? data->programName : data->argv[0]);
