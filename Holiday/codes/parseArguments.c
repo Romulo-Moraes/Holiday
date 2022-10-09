@@ -64,8 +64,7 @@ int checkIfAllRequiredArgumentsWasGiven(argParserData *data){
 
             for(int j = 0; j < data->allCollectedOptionalArgumentsIndex; j++){
 
-                if(strcmp(data->all
-                [j].longArgumentName, data->necessaryOptionalArguments[i].longArgumentName) == 0 || strcmp(data->allCollectedOptionalArguments[j].shortArgumentName, data->necessaryOptionalArguments[i].shortArgumentName) == 0){
+                if(strcmp(data->allCollectedOptionalArguments[j].longArgumentName, data->necessaryOptionalArguments[i].longArgumentName) == 0 || strcmp(data->allCollectedOptionalArguments[j].shortArgumentName, data->necessaryOptionalArguments[i].shortArgumentName) == 0){
                     found = TRUE;
                 }
             }
