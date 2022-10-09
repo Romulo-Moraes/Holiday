@@ -9,7 +9,7 @@
 Holiday is an argument parser for C programming language, this support optional arguments, positional arguments and some salt in each one. The library is not complex to use and is divided in one header file that need just be included in your code, and some code files that need be passed to your compiler
 
 ## Cross-platform
-This lib only use C standard libraries in its includes then you can use it on any platform. These is the used C standard libs:
+This lib only use C standard libraries in its includes then you can use it on any platform. These are the used C standard libs:
 <ul>
     <li>string.h</li>
     <li>stdlib.h</li>
@@ -42,7 +42,7 @@ gcc main.c Holiday/codes/*.c -o main
 
 
 ### Using the Holiday
-After including it you need to initialize a struct that will store all information about the Holiday, it need mainly of two arguments, argc and argv. the 3° and 4° argParserInit argument is optional, but should be filled at least with empty string "". The 3° give a default name for your program, and ehd 4° give a about section for your program, both are displayed in help message if the user get stuck.
+After including it you need to initialize a struct that will store all information about the Holiday, it need mainly of two arguments, argc and argv. the 3° and 4° argParserInit argument is optional, but should be filled at least with empty string "". The 3° give a default name for your program, and the 4° give a about section for your program, both are displayed in help message if the user get stuck.
 
 ```c
 argParserData data = argParserInit(argc,argv, "calc", "Calculate two numbers given in program call");
@@ -51,7 +51,7 @@ after initializing the argParserData struct you can start programming the requir
 
 Optional way
 ```c
-// addOptionalArgument(<argParserData>, <long argument name>, <short argument name>, <if need value>, <a help that will showed if the user get stuck>>, <if this optional argument is required>);
+// addOptionalArgument(<argParserData>, <long argument name>, <short argument name>, <if need value>, <a help that will be showed if the user get stuck>, <if this optional argument is required>);
 
 addOptionalArgument(&data, "--name", "-n", TRUE, "Pass your name to program", FALSE);
 ```
@@ -61,7 +61,7 @@ addOptionalArgument function has a min/max size for full optional name and short
 
 Positional way
 ```c
-// addPositionalArgument(<argParserData>, <identifier>, <a help that will showed if the user get stuck>);
+// addPositionalArgument(<argParserData>, <identifier>, <a help that will be showed if the user get stuck>);
 
 addPositionalArgument(&data, "age", "Pass your age to program");
 ```
@@ -71,11 +71,9 @@ Positional arguments need a min value length, anything greater or equal than 2 c
 
 Parsing
 ```c
-// parseArguments(<argParserData>, <if can exit program if something that the user typed is wrong>);
+// parseArguments(<argParserData>, <exit error code if something wen't wrong, showing the help message together>);
 
-// If something wrong, the lib will print a help message in terminal
-
-parseArguments(&data, true);
+parseArguments(&data, 0);
 ```
 
 Checking if an optional argument was triggered
@@ -88,7 +86,7 @@ optionalWasSet(data, "-n");
 
 Getting a value from optional arguments
 ```c
-// getArgumentValue(<argParserData>, <flag to get>);
+// getOptionalArgumentValue(<argParserData>, <flag to get>);
 
 
 // This function return a string or NULL if not found
@@ -97,7 +95,7 @@ getOptionalArgumentValue(&data, "--name");
 
 Getting a value from positional arguments
 ```c
-// getArgumentValue(<argParserData>, <ID to get>);
+// getPositionalArgumentValue(<argParserData>, <ID to get>);
 
 
 // This function return a string or NULL if not found
