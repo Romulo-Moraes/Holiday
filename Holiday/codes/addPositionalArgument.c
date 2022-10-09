@@ -10,12 +10,12 @@ void addPositionalArgument(argParserData *data, char *argumentID, char *helpMess
     /* The argument ID should has at least two characters, with dashes not counting, if not, raise an "exception" */
     if(strlen(argumentIDWithMoreSpace) < 2){    
         puts("[Holiday log] Positional argument ID should has 2 characters or more, dashes don't count");
-        exit(0);
+        exit(DEBUG_ERROR_CODE);
     }
 
     if(isdigit(argumentIDWithMoreSpace[0])){
         puts("[Holiday log] The first character of positional argument ID shouldn't be a number");
-        exit(0);
+        exit(DEBUG_ERROR_CODE);
     }
 
     data->necessaryPositionalArguments[data->necessaryPositionalArgumentsIndex] = createNecessaryPositionalArgument(argumentIDWithMoreSpace, helpMessage);

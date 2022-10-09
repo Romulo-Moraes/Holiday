@@ -16,6 +16,8 @@
 #define UPPERCASE_CHARS_BEGIN 65
 #define UPPERCASE_CHARS_END 90
 
+#define DEBUG_ERROR_CODE 1
+
 typedef struct{  
     char longArgumentName[DEFAULT_ARRAY_SIZE];
     char shortArgumentName[3];
@@ -77,7 +79,7 @@ char* getOptionalArgumentValue(argParserData *data, char *argumentName);
 char* getPositionalArgumentValue(argParserData *data, char *argumentID);
 
 int checkIfArgumentIsNumeric(char *argument);
-int checkIfUnknowArgumentsWasPassedToProgram(argParserData *data);
+int checkIfUnknowArgumentsWerePassedToProgram(argParserData *data);
 int checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data);
 int checkIfAllRequiredArgumentsWasGiven(argParserData *data);
 void showHelpMessage(argParserData *data, int exitCode);
@@ -93,6 +95,6 @@ names getOppositeSizeOfArgumentName(argParserData *data, char *argumentName);
 int pickupAllLongArgumentNames(argParserData *data, int *argvPosition);
 neededPositionalArgument createNecessaryPositionalArgument(char *argumentID, char *helpMessage);
 neededOptionalArgument createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
-void controlDashesCountInLongArgumentName(char *argument, int isLongArgumentName);
+int dashesChecking(char *argument, int isLongArgumentName, int *dashesInBeginOutput);
 int retrieveArgumentNameSize(char *argument);
 void removeDashesFromPositionalArgument(char *argument, int argumentBufferSize);

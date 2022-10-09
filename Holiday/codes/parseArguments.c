@@ -1,29 +1,29 @@
 #include "./../Holiday.h"
 
-void parseArguments(argParserData *data, int enableBreak){
+void parseArguments(argParserData *data, int possibleErrorCode){
     int argvPosition = 1;
 
     while(argvPosition < data->argc){
         if(pickupAllLongArgumentNames(data, &argvPosition) == 0){
             if(argvPosition < data->argc){
                 if(pickupAllShortArgumentNames(data, &argvPosition) != 0){
-                    showHelpMessage(data, 0);
+                    showHelpMessage(data, possibleErrorCode);
                 }    
             }
             
         }
         else{
-            showHelpMessage(data, 0);
+            showHelpMessage(data, possibleErrorCode);
         }
     }
 
     /* This if case is executed in sequence and if any error is reported from any process the program show the help message and exit */
-    if(pickupAllPositionalArguments(data) != 0 || checkIfAllRequiredArgumentsWasGiven(data) == 0 || checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || checkIfUnknowArgumentsWasPassedToProgram(data) != 0){
-        showHelpMessage(data, 0);
+    if(pickupAllPositionalArguments(data) != 0 || checkIfAllRequiredArgumentsWasGiven(data) == 0 || checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
+        showHelpMessage(data, possibleErrorCode);
     }
 }
 
-int checkIfUnknowArgumentsWasPassedToProgram(argParserData *data){
+int checkIfUnknowArgumentsWerePassedToProgram(argParserData *data){
     int found = FALSE;
 
     /* The strategy here is run the collected array and compare if each element exists in the necessary array */

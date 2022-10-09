@@ -2,64 +2,54 @@
 
 /* This function will create a new require of arguments in argParserData struct, from there all arguments will be searched */
 void addOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired){
-    char newShortArgumentNameChar;
+    int dashesInBegin = 0;
 
-    /* Creating and copying to a buffer with more space */
-    char longArgumentNameWithMoreSpace[DEFAULT_ARRAY_SIZE];
-    char shortArgumentNameWithMoreSpace[DEFAULT_ARRAY_SIZE];
 
-    strcpy(longArgumentNameWithMoreSpace, longArgumentName);
-    strcpy(shortArgumentNameWithMoreSpace, shortArgumentName);
+    /* Checking if some arguments were passed wrong */
+    if(dashesChecking(longArgumentName, TRUE, &dashesInBegin) != TRUE){
+        printf("[Holiday log] Long optional argument name \"%s\" should start with two dashes, started with: %d\n", longArgumentName, dashesInBegin);
+        exit(DEBUG_ERROR_CODE);
+    }
 
-    /* Fixing if some optional argument comes with less or more dashes than expected */
-    controlDashesCountInLongArgumentName(longArgumentNameWithMoreSpace, TRUE);
-    controlDashesCountInLongArgumentName(shortArgumentNameWithMoreSpace, FALSE);
+    if(dashesChecking(shortArgumentName, FALSE, &dashesInBegin) != TRUE){
+        printf("[Holiday log] Short optional argument name \"%s\" should start with one dash, started with: %d\n", shortArgumentName, dashesInBegin);
+        exit(DEBUG_ERROR_CODE);
+    }
 
     /* long argument names should has more than 2 characters of length beyond the two dashes, if not, raise a "exception" */
-    if(retrieveArgumentNameSize(longArgumentNameWithMoreSpace) < 2){
+    if(retrieveArgumentNameSize(longArgumentName) < 2){
         puts("[Holiday log] Long argument names should has two or more characters in its name, beyond the dashes");
-        exit(0);
+        exit(DEBUG_ERROR_CODE);
     }
 
     /* long argument names should has only 1 character of length beyond the one dashe, if not, raise a "exception" */
-    if(retrieveArgumentNameSize(shortArgumentNameWithMoreSpace) != 1){
+    if(retrieveArgumentNameSize(shortArgumentName) != 1){
         puts("[Holiday log] Short argument names should has only one character in its name, beyond the dash");
-        exit(0);
+        exit(DEBUG_ERROR_CODE);
     }
 
-    if(checkIfLongNameArgumentWasAlreadyGiven(data, longArgumentNameWithMoreSpace) == TRUE){
+    if(checkIfLongNameArgumentWasAlreadyGiven(data, longArgumentName) == TRUE){
         puts("[Holiday log] Long argument name already required by the programmer");
-        exit(0);
+        exit(DEBUG_ERROR_CODE);
     }
 
-    if(isdigit(longArgumentNameWithMoreSpace[2])){
+    if(isdigit(longArgumentName[2])){
         puts("[Holiday log] The first character of long argument name shouldn't be a number");
-        exit(0);
+        exit(DEBUG_ERROR_CODE);
     }
 
-    if(isdigit(shortArgumentNameWithMoreSpace[1])){
+    if(isdigit(shortArgumentName[1])){
         puts("[Holiday log] The short optional name shouldn't be a number");
-        exit(0);
+        exit(DEBUG_ERROR_CODE);
     }
 
-    if(checkIfShortArgumentNameWasAlreadyGiven(data, shortArgumentNameWithMoreSpace) == TRUE){
-        shortArgumentNameWithMoreSpace[1] = isupper(shortArgumentNameWithMoreSpace[1]) ? tolower(shortArgumentNameWithMoreSpace[1]) : toupper(shortArgumentNameWithMoreSpace[1]);
-
-        if(checkIfShortArgumentNameWasAlreadyGiven(data, shortArgumentNameWithMoreSpace) == TRUE){
-            newShortArgumentNameChar = createNewShortArgumentName(data);
-
-            if(newShortArgumentNameChar != '!'){
-                shortArgumentNameWithMoreSpace[1] = newShortArgumentNameChar;
-            }
-            else{
-                puts("[Holiday log] Short argument name already required by the programmer and can't find another one");
-                exit(0);
-            }
-        }   
+    if(checkIfShortArgumentNameWasAlreadyGiven(data, shortArgumentName) == TRUE){
+        printf("[Holiday log] Short argument name conflict, this name was used 2 times: %s\n", shortArgumentName);
+        exit(DEBUG_ERROR_CODE);
     }
 
     /* Create the required argument properly */
-    data->necessaryOptionalArguments[data->necessaryOptionalArgumentsIndex] = createNecessaryOptionalArgument(data, longArgumentNameWithMoreSpace, shortArgumentNameWithMoreSpace, needValue, helpMessage, isRequired);
+    data->necessaryOptionalArguments[data->necessaryOptionalArgumentsIndex] = createNecessaryOptionalArgument(data, longArgumentName, shortArgumentName, needValue, helpMessage, isRequired);
     data->necessaryOptionalArgumentsIndex += 1;
 }
 
@@ -82,7 +72,7 @@ char createNewShortArgumentName(argParserData *data){
         }
     }
 
-    puts("sesgo");
+
     return '!';
 }
 
@@ -130,22 +120,34 @@ int retrieveArgumentNameSize(char *argument){
     return strlen(&argument[i]);
 }
 
-/* This function will control the number of dashes in an argument name */
-void controlDashesCountInLongArgumentName(char *argument, int isLongArgumentName){
-    char midwayBuffer[256] = {0};
-    int dashesCount = 0;
+/* This procedure will check the count of dashes for each type of argument */
+int dashesChecking(char *argument, int isLongArgumentName, int *dashesInBeginOutput){
+    int dashesInBegin = 0;
     int i = 0;
+    int nonDashFound = FALSE;
 
-    while(argument[i]  == '-'){
-        dashesCount++;
+    while(argument[i] != '\0' && nonDashFound == FALSE){
+        if(argument[i] == '-'){
+            dashesInBegin++;
+        }
+        else{
+            nonDashFound = TRUE;
+        }
         i++;
     }
 
+    *dashesInBeginOutput =  dashesInBegin;
+
     if(isLongArgumentName == TRUE){
-        sprintf(midwayBuffer, "--%s", &argument[dashesCount]);
+        if(dashesInBegin != 2){
+            return FALSE;
+        }
     }
     else{
-        sprintf(midwayBuffer, "-%s", &argument[dashesCount]);
+        if(dashesInBegin != 1){
+            return FALSE;
+        }
     }
-    strcpy(argument, midwayBuffer); 
+
+    return TRUE;
 }
