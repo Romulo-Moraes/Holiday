@@ -107,7 +107,6 @@ void HOLIDAY__appendCollectedPositional(argParserData *data, int *allCollectedPo
     HOLIDAY__collectedPositionalArgumentListCell *p = NULL, *q = NULL;
 
     if(theNewArgument != NULL){
-        //printf("Testing something: %s\n", data->necessaryPositionalArguments[*allCollectedPositionalArgumentBegin].argumentID);
         strcpy(theNewArgument->argumentID, HOLIDAY__searchNeededPositionalValueInListByIndex(*allCollectedPositionalArgumentBegin, data->necessaryPositionalArguments)->argumentID);
         theNewArgument->value = data->argv[i];
         theNewArgument->next = NULL;

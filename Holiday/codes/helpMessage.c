@@ -9,10 +9,8 @@ void HOLIDAY__showHelpMessage(argParserData *data, int exitCode){
         printf("%s\n\n", data->programAbout);
     }
 
-    //printf("%s --> How to use the program\n\n", strlen(data->programName) > 0 ? data->programName : data->argv[0]);
     printf("Usage: %s [OPTIONS]\n\n", data->programName);
 
-    //printf("%s %s%s\n", strlen(data->programName) > 0 ? data->programName : data->argv[0], data->necessaryPositionalArgumentsIndex > 0 ? "<[Positional arguments]> " : " ", data->necessaryOptionalArgumentsIndex > 0 ? "--<[Optional argument]> or -<[Short optional argument]> <[Short optional argument value]>" : "");
 
     printf("Options:\n");
     while(requiredPositionalArgumentsPointerCopy != NULL){
