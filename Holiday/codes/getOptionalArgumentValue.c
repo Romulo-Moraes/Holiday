@@ -3,10 +3,5 @@
 char* getOptionalArgumentValue(argParserData *data, char *argumentName){
     HOLIDAY__collectedOptionalArgumentListCell *cellOfArgumentList = HOLIDAY__searchCollectedOptionalValueInList(argumentName, data->allCollectedOptionalArguments);
 
-    if(cellOfArgumentList == NULL){
-        return NULL;
-    }
-    else{
-        return cellOfArgumentList->value;
-    }
+    return cellOfArgumentList == NULL ? NULL : cellOfArgumentList->value;
 }

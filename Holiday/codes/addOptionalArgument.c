@@ -1,7 +1,7 @@
 #include "./../Holiday.h"
 
 /* This function will create a new require of arguments in argParserData struct, from there all arguments will be searched */
-void addOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired){
+int addOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired){
     int dashesInBegin = 0;
 
 
@@ -49,8 +49,19 @@ void addOptionalArgument(argParserData *data, char *longArgumentName, char *shor
     }
 
     /* Create the required argument properly */
-    HOLIDAY__appendOptionalArgument(data, HOLIDAY__createNecessaryOptionalArgument(data, longArgumentName, shortArgumentName, needValue, helpMessage, isRequired));
-    data->necessaryOptionalArgumentsIndex += 1;
+    if(HOLIDAY__appendOptionalArgument(data, HOLIDAY__createNecessaryOptionalArgument(data, longArgumentName, shortArgumentName, needValue, helpMessage, isRequired)) == HEAP_REQUEST_FINE){
+        data->necessaryOptionalArgumentsIndex += 1;
+        return HEAP_REQUEST_FINE;
+    }
+    else{
+        if(data->notifyOnMemoryFault == TRUE){
+            return HEAP_REQUEST_FAULT;
+        }
+        else{
+            puts("[LOG] Program exited due to fail on heap allocation [LOG]");
+            exit(1);
+        }
+    }
 }
 
 char HOLIDAY__createNewShortArgumentName(argParserData *data){
@@ -77,6 +88,9 @@ char HOLIDAY__createNewShortArgumentName(argParserData *data){
 }
 
 int HOLIDAY__checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *argumentName){
+    return HOLIDAY__searchNeededOptionalValueInList(argumentName, argumentName, data->necessaryOptionalArguments) == NULL ? FALSE : TRUE;
+
+    /*
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
         if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argumentName) == 0){
             return TRUE;
@@ -84,9 +98,13 @@ int HOLIDAY__checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *a
     }
 
     return FALSE;
+    */
 }
 
 int HOLIDAY__checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *argumentName){
+    return HOLIDAY__searchNeededOptionalValueInList(argumentName, argumentName, data->necessaryOptionalArguments) == NULL ? FALSE : TRUE;
+
+    /*
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
         if(strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argumentName) == 0){
             return TRUE;
@@ -94,6 +112,7 @@ int HOLIDAY__checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *
     }
 
     return FALSE;
+    */
 }
 
 /* Function to make the argument creation most easy */

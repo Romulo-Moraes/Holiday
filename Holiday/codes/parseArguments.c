@@ -1,25 +1,25 @@
 #include "./../Holiday.h"
 
-void parseArguments(argParserData *data, int possibleErrorCode){
+void parseArguments(argParserData *data){
     int argvPosition = 1;
 
     while(argvPosition < data->argc){
         if(HOLIDAY__pickupAllLongArgumentNames(data, &argvPosition) == 0){
             if(argvPosition < data->argc){
                 if(HOLIDAY__pickupAllShortArgumentNames(data, &argvPosition) != 0){
-                    HOLIDAY__showHelpMessage(data, possibleErrorCode);
+                    HOLIDAY__showHelpMessage(data);
                 }    
             }
             
         }
         else{
-            HOLIDAY__showHelpMessage(data, possibleErrorCode);
+            HOLIDAY__showHelpMessage(data);
         }
     }
 
     /* This if case is executed in sequence and if any error is reported from any process the program show the help message and exit */
     if(HOLIDAY__pickupAllPositionalArguments(data) != 0 || HOLIDAY__checkIfAllRequiredArgumentsWasGiven(data) == 0 || HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
-        HOLIDAY__showHelpMessage(data, possibleErrorCode);
+        HOLIDAY__showHelpMessage(data);
     }
 }
 
@@ -66,6 +66,7 @@ int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data){
                 if(strcmp(p->longArgumentName, q->longArgumentName) == 0 || strcmp(p->shortArgumentName, q->shortArgumentName) == 0){
                     found = TRUE;
                 }
+                p = p->next;
             }
 
             if(found == FALSE){
@@ -74,14 +75,6 @@ int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data){
             else{
                 found = FALSE;
             }
-            /*
-            if(found == TRUE){
-                found = FALSE;
-            }
-            else{
-                return FALSE;
-            }
-            */
         }
 
         q = q->next;
@@ -227,7 +220,6 @@ int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
 
         /* Checking if the found argument is required by the programmer */
         if(HOLIDAY__checkIfOptionalArgumentIsRequired(data, data->argv[currentArgvPosition]) == TRUE){
-
             /* Checking if the found argument need a value with it */
             if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, data->argv[currentArgvPosition]) == TRUE){
                 if(currentArgvPosition + 1 < data->argc){
@@ -244,6 +236,7 @@ int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
 
             argumentNames = HOLIDAY__getOppositeSizeOfArgumentName(data, data->argv[currentArgvPosition]);
                 
+
             strcpy(newCollectedOptionalArgument.longArgumentName, argumentNames.longArgumentName);
             strcpy(newCollectedOptionalArgument.shortArgumentName, argumentNames.shortArgumentName);
 
@@ -265,13 +258,19 @@ int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
 
 names HOLIDAY__getOppositeSizeOfArgumentName(argParserData *data, char *argumentName){
     names argumentNames;
+    HOLIDAY__neededOptionalArgumentListCell *theArgument = HOLIDAY__searchNeededOptionalValueInList(argumentName, argumentName, data->necessaryOptionalArguments);
 
+    strcpy(argumentNames.longArgumentName, theArgument->longArgumentName);
+    strcpy(argumentNames.shortArgumentName, theArgument->shortArgumentName);
+
+    /*
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
         if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argumentName) == 0 || strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argumentName) == 0){
             strcpy(argumentNames.longArgumentName, data->necessaryOptionalArguments[i].longArgumentName);
             strcpy(argumentNames.shortArgumentName, data->necessaryOptionalArguments[i].shortArgumentName);
         }
     }
+    */
 
     return argumentNames;
 }
@@ -279,24 +278,34 @@ names HOLIDAY__getOppositeSizeOfArgumentName(argParserData *data, char *argument
 
 /* This function will check if a optional argument need a value after it */
 int HOLIDAY__checkIfOptionalArgumentNeedValue(argParserData *data, char *argument){
+    return HOLIDAY__searchNeededOptionalValueInList(argument,argument, data->necessaryOptionalArguments)->needValue;
+/*
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
 
-        /* It's right that in some time this "if" will be true, but in the end has a return just to compiler be happy */
+        /* It's right that in some time this "if" will be true, but in the end has a return just to compiler be happy 
         if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argument) == 0 || strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argument) == 0){
             return data->necessaryOptionalArguments[i].needValue;
         }
     }
 
     return FALSE;
+*/
 }
 
 /* Check if a argument was declared in code, if found in array of necessaries it was declared */
 int HOLIDAY__checkIfOptionalArgumentIsRequired(argParserData *data, char *argument){
+    HOLIDAY__neededOptionalArgumentListCell *theArgument = HOLIDAY__searchNeededOptionalValueInList(argument, argument, data->necessaryOptionalArguments);
+
+
+    return theArgument == NULL ? FALSE : TRUE;
+
+    /*
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
         if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argument) == 0 || strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argument) == 0){
             return TRUE;
         }
     }
+    */
 
-    return FALSE;
+    //return FALSE;
 }

@@ -4,6 +4,8 @@
 #include <ctype.h>
 
 #define DEFAULT_ARRAY_SIZE 128
+#define HEAP_REQUEST_FINE 1
+#define HEAP_REQUEST_FAULT -1
 
 #define ARGUMENT_NOT_REQUIRED 2
 #define ARGUMENT_WITHOUT_VALUE 3
@@ -65,6 +67,7 @@ typedef struct{
     HOLIDAY__neededOptionalArgumentListCell *necessaryOptionalArguments;
     HOLIDAY__collectedOptionalArgumentListCell *allCollectedOptionalArguments;
     HOLIDAY__collectedPositionalArgumentListCell *allCollectedPositionalArguments;
+    int notifyOnMemoryFault;
     int necessaryPositionalArgumentsIndex;
     int necessaryOptionalArgumentsIndex;
     int allCollectedOptionalArgumentsIndex;
@@ -74,10 +77,10 @@ typedef struct{
 
 
 /* Principals functions */
-argParserData argParserInit(int argc, char *argv[], char *programName, char *programAbout);
-void addOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
-void addPositionalArgument(argParserData *data, char *argumentID, char *helpMessage);
-void parseArguments(argParserData *data, int possibleErrorCode);
+argParserData argParserInit(int argc, char *argv[], char *programName, char *programAbout, int notifyOnMemoryFault);
+int addOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
+int addPositionalArgument(argParserData *data, char *argumentID, char *helpMessage);
+void parseArguments(argParserData *data);
 int optionalWasSet(argParserData *data, char *argumentName);
 char* getOptionalArgumentValue(argParserData *data, char *argumentName);
 char* getPositionalArgumentValue(argParserData *data, char *argumentID);
@@ -87,7 +90,7 @@ int HOLIDAY__checkIfArgumentIsNumeric(char *argument);
 int HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(argParserData *data);
 int HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *data);
 int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data);
-void HOLIDAY__showHelpMessage(argParserData *data, int exitCode);
+void HOLIDAY__showHelpMessage(argParserData *data);
 int HOLIDAY__checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *argumentName);
 int HOLIDAY__checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *argumentName);
 char HOLIDAY__createNewShortArgumentName(argParserData *data);
@@ -102,8 +105,8 @@ HOLIDAY__neededOptionalArgumentListCell HOLIDAY__createNecessaryOptionalArgument
 int HOLIDAY__dashesChecking(char *argument, int isLongArgumentName, int *dashesInBeginOutput);
 int HOLIDAY__retrieveArgumentNameSize(char *argument);
 void HOLIDAY__checkDashesInStringBeginning(char *buffer);
-void HOLIDAY__appendOptionalArgument(argParserData *data, HOLIDAY__neededOptionalArgumentListCell newNecessaryArgument);
-void HOLIDAY__appendPositionalArgument(argParserData *data, HOLIDAY__neededPositionalArgumentListCell newNecessaryArgument);
+int HOLIDAY__appendOptionalArgument(argParserData *data, HOLIDAY__neededOptionalArgumentListCell newNecessaryArgument);
+int HOLIDAY__appendPositionalArgument(argParserData *data, HOLIDAY__neededPositionalArgumentListCell newNecessaryArgument);
 void HOLIDAY__appendCollectedOptionalArgument(argParserData *data, HOLIDAY__collectedOptionalArgumentListCell newArgument);
 void HOLIDAY__appendCollectedPositional(argParserData *data, int *allCollectedPositionalArgumentBegin, int i);
 void HOLIDAY__destroyNeededPositionalArguments(HOLIDAY__neededPositionalArgumentListCell **theArgumentList);

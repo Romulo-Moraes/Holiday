@@ -1,7 +1,7 @@
 #include "./../Holiday.h"
 
 /* This function will create a new require of arguments in argParserData struct, from there all arguments will be searched */
-void addPositionalArgument(argParserData *data, char *argumentID, char *helpMessage){
+int addPositionalArgument(argParserData *data, char *argumentID, char *helpMessage){
 
     HOLIDAY__checkDashesInStringBeginning(argumentID);
 
@@ -16,8 +16,19 @@ void addPositionalArgument(argParserData *data, char *argumentID, char *helpMess
         exit(DEBUG_ERROR_CODE);
     }
 
-    HOLIDAY__appendPositionalArgument(data, HOLIDAY__createNecessaryPositionalArgument(argumentID, helpMessage));
-    data->necessaryPositionalArgumentsIndex += 1;
+    if(HOLIDAY__appendPositionalArgument(data, HOLIDAY__createNecessaryPositionalArgument(argumentID, helpMessage)) == HEAP_REQUEST_FINE){
+        data->necessaryPositionalArgumentsIndex += 1;
+        return HEAP_REQUEST_FINE;
+    }
+    else{
+        if(data->notifyOnMemoryFault == TRUE){
+            return HEAP_REQUEST_FAULT;
+        }
+        else{
+            puts("[LOG] Program exited due to fail on heap allocation [LOG]");
+            exit(1);
+        }
+    }
 }
 
 /* This function help to create a positional argument requirement most easier */

@@ -1,13 +1,15 @@
 #include "./../Holiday.h"
 
 
-argParserData argParserInit(int argc, char *argv[], char *programName, char *programAbout){
+argParserData argParserInit(int argc, char *argv[], char *programName, char *programAbout, int notifyOnMemoryFault){
     argParserData data;
 
     data.argc = argc;
     data.argv = argv;
 
     memset(data.programName, '\0', sizeof(data.programName));
+
+    data.notifyOnMemoryFault = notifyOnMemoryFault != 0 ? TRUE : FALSE;
 
     data.necessaryOptionalArguments = NULL;
     data.necessaryPositionalArguments = NULL;

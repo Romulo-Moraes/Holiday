@@ -1,8 +1,9 @@
 #include "./../Holiday.h"
 
-void HOLIDAY__appendPositionalArgument(argParserData *data, HOLIDAY__neededPositionalArgumentListCell newNecessaryArgument){
+int HOLIDAY__appendPositionalArgument(argParserData *data, HOLIDAY__neededPositionalArgumentListCell newNecessaryArgument){
     HOLIDAY__neededPositionalArgumentListCell *theNewArgument = (HOLIDAY__neededPositionalArgumentListCell*) malloc(sizeof(HOLIDAY__neededPositionalArgumentListCell));
     HOLIDAY__neededPositionalArgumentListCell *p = NULL, *q = NULL;
+
 
     if(theNewArgument!= NULL){
         strcpy(theNewArgument->argumentID, newNecessaryArgument.argumentID);
@@ -23,18 +24,20 @@ void HOLIDAY__appendPositionalArgument(argParserData *data, HOLIDAY__neededPosit
 
             p->next = theNewArgument;
         }
+
+        return HEAP_REQUEST_FINE;
     }
     else{
-        //TODO!!! (Fail on get heap memory)
+        return HEAP_REQUEST_FAULT;
     }
 }
 
-void HOLIDAY__appendOptionalArgument(argParserData *data, HOLIDAY__neededOptionalArgumentListCell newNecessaryArgument){
+int HOLIDAY__appendOptionalArgument(argParserData *data, HOLIDAY__neededOptionalArgumentListCell newNecessaryArgument){
     HOLIDAY__neededOptionalArgumentListCell *theNewArgument = (HOLIDAY__neededOptionalArgumentListCell*) malloc(sizeof(HOLIDAY__neededOptionalArgumentListCell));
     HOLIDAY__neededOptionalArgumentListCell *p = NULL, *q = NULL;
 
 
-    if(theNewArgument!= NULL){
+    if(theNewArgument != NULL){
         strcpy(theNewArgument->longArgumentName, newNecessaryArgument.longArgumentName);
         strcpy(theNewArgument->shortArgumentName, newNecessaryArgument.shortArgumentName);
         strcpy(theNewArgument->helpMessage, newNecessaryArgument.helpMessage);
@@ -56,9 +59,11 @@ void HOLIDAY__appendOptionalArgument(argParserData *data, HOLIDAY__neededOptiona
 
             p->next = theNewArgument;
         }
+
+        return HEAP_REQUEST_FINE;
     }
     else{
-        //TODO!!! (Fail on get heap memory)
+        return HEAP_REQUEST_FAULT;
     }
 }
 

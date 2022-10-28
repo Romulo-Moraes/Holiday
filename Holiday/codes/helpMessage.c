@@ -1,6 +1,6 @@
 #include "./../Holiday.h"
 
-void HOLIDAY__showHelpMessage(argParserData *data, int exitCode){
+void HOLIDAY__showHelpMessage(argParserData *data){
     HOLIDAY__neededPositionalArgumentListCell *requiredPositionalArgumentsPointerCopy = data->necessaryPositionalArguments;
     HOLIDAY__neededOptionalArgumentListCell * optionalArgumentsPointerCopy = data->necessaryOptionalArguments;
     int programAboutLength = strlen(data->programAbout);
@@ -26,5 +26,5 @@ void HOLIDAY__showHelpMessage(argParserData *data, int exitCode){
     }
 
     puts("\nEnd of help message");  
-    exit(exitCode);
+    exit(0);
 }

@@ -34,7 +34,7 @@ For better understanding of me and any person that will use this code, all funct
 ```
 
 ### Compilation time
-All codes of Holiday lib are in Holiday/code, so to compile it you need to pass the entire code directory to the compiler, like in the following example that simulate as if Holiday folder is in current directory of main file of program, the main.c.
+All codes of Holiday lib are in Holiday/code, then to compile it you must to pass the entire code directory to the compiler, like in the following example that simulate as if Holiday folder is in current directory of main file of program, the main.c.
 
 ```sh
 gcc main.c Holiday/codes/*.c -o main
@@ -42,10 +42,10 @@ gcc main.c Holiday/codes/*.c -o main
 
 
 ### Using the Holiday
-After including it you need to initialize a struct that will store all information about the Holiday, it need mainly of two arguments, argc and argv. the 3° and 4° argParserInit argument is optional, but should be filled at least with empty string "". The 3° give a default name for your program, and the 4° give a about section for your program, both are displayed in help message if the user get stuck.
+After including it you must to initialize a struct that will store all information about the Holiday, it need mainly of two arguments, argc and argv. the 3° and 4° argParserInit argument is optional, but should be filled at least with empty strings "", the library need to make some heap allocations, then the 5° argument is telling to the lib if you wan't receive a signal if something is wrong. The 3° give a default name for your program, and the 4° give a about section for your program, both are displayed in help message if the user get stuck.
 
 ```c
-argParserData data = argParserInit(argc,argv, "calc", "Calculate two numbers given in program call");
+argParserData data = argParserInit(argc,argv, "calc", "Calculate two numbers given in program call", FALSE);
 ```
 after initializing the argParserData struct you can start programming the required arguments in your program. You have two ways, the optional argument and the positional argument.
 
@@ -53,7 +53,9 @@ Optional way
 ```c
 // addOptionalArgument(<argParserData>, <long argument name>, <short argument name>, <if need value>, <a help that will be showed if the user get stuck>, <if this optional argument is required>);
 
-addOptionalArgument(&data, "--name", "-n", TRUE, "Pass your name to program", FALSE);
+// This method uses a linked list to store the requested arguments, it always will return a faultAlert to you know if something is wrong in dynamic allocation. You can only handle this value if the 5° argument of argParserInit is TRUE, if not, an exit is called with the message: [LOG] Program exited due to fail on heap allocation [LOG]. If nothing happened wrong then faultAlert = (macro) HEAP_REQUEST_FINE, if not, faultAlert = (macro) HEAP_REQUEST_FAULT.
+
+int faultAlert = addOptionalArgument(&data, "--name", "-n", TRUE, "Pass your name to program", FALSE);
 ```
 
 ### Optional way warnings !!!
@@ -63,7 +65,10 @@ Positional way
 ```c
 // addPositionalArgument(<argParserData>, <identifier>, <a help that will be showed if the user get stuck>);
 
-addPositionalArgument(&data, "age", "Pass your age to program");
+
+// This method uses a linked list to store the requested arguments, it always will return a faultAlert to you know if something is wrong in dynamic allocation. You can only handle this value if the 5° argument of argParserInit is TRUE, if not, an exit is called with the message: [LOG] Program exited due to fail on heap allocation [LOG]. If nothing happened wrong then faultAlert = (macro) HEAP_REQUEST_FINE, if not, faultAlert = (macro) HEAP_REQUEST_FAULT. 
+
+int faultAlert = addPositionalArgument(&data, "age", "Pass your age to program");
 ```
 
 ### Positional way warnings !!!
@@ -71,9 +76,9 @@ Positional arguments need a min value length, anything greater or equal than 2 c
 
 Parsing
 ```c
-// parseArguments(<argParserData>, <exit error code if something wen't wrong, showing the help message together>);
+// parseArguments(<argParserData>);
 
-parseArguments(&data, 0);
+parseArguments(&data);
 ```
 
 Checking if an optional argument was triggered
@@ -103,7 +108,7 @@ getPositionalArgumentValue(&data, "age");
 
 Destroying the library's data
 ```c
-// The library do some allocations in heap, then when you don't need the library data anymore you can just free all the allocations calling the DestroyHoliday function
+// The library do some allocations in heap, then when you don't need the library data anymore you can just free all the allocations calling the destroyHoliday function
 destroyHoliday(&data);
 ```
 
@@ -116,13 +121,13 @@ This is a functional program with this library, using all functions above
 int main(int argc, char *argv[])
 {
     int number1, number2;
-    argParserData data = argParserInit(argc, argv, "calc", "Calculate two numbers given in program call");
+    argParserData data = argParserInit(argc, argv, "calc", "Calculate two numbers given in program call", FALSE);
 
     addOptionalArgument(&data, "--operation", "-o", TRUE, "Math operator", FALSE);
     addPositionalArgument(&data, "number1", "Pass the first number");
     addPositionalArgument(&data, "number2", "Pass the second number");
 
-    parseArguments(&data, TRUE);
+    parseArguments(&data);
 
     number1 = atoi(getPositionalArgumentValue(&data, "number1"));
     number2 = atoi(getPositionalArgumentValue(&data, "number2"));
