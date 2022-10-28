@@ -97,15 +97,20 @@ Getting a value from positional arguments
 ```c
 // getPositionalArgumentValue(<argParserData>, <ID to get>);
 
-
 // This function return a string or NULL if not found
 getPositionalArgumentValue(&data, "age");
+```
+
+Destroying the library's data
+```c
+// The library do some allocations in heap, then when you don't need the library data anymore you can just free all the allocations calling the DestroyHoliday function
+destroyHoliday(&data);
 ```
 
 This is a functional program with this library, using all functions above
 ```c
 #include <stdio.h>
-#include "Holiday2/Holiday/Holiday.h"
+#include "Holiday/Holiday.h"
 #include <stdlib.h>
 
 int main(int argc, char *argv[])
@@ -149,6 +154,8 @@ int main(int argc, char *argv[])
         puts("Can't do the calculation without the operator");
     }
 
+    destroyHoliday(&data);
+
     return 0;
 }
 ```
@@ -165,19 +172,20 @@ Inputs / Outputs
 30
 ```
 
-Note: the character '*' is interpreted different of just a symbol, to terminal it's all files in directory, then it need be pass with quotes.
+Note: the character '*' is interpreted different of just a symbol, to terminal it's all files in directory, then it must be passed with quotes.
 
 
 Error message if just one or no one number is passed
 ```txt
-calc --> How to use the program
+Calculate two numbers given in program call
 
-calc <[Positional arguments]> --<[Optional argument]> or -<[Short optional argument]> <[Short optional argument value]>
-About: Calculate two numbers given in program call
+Usage: calc [OPTIONS]
 
-number1 --> Pass the first number (required)
-number2 --> Pass the second number (required)
---operation / -o --> Math operator 
+Options:
+        number1 --> Pass the first number (required)
+        number2 --> Pass the second number (required)
+
+        --operation / -o --> Math operator 
 
 End of help message
 ```

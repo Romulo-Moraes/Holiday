@@ -49,7 +49,7 @@ void addOptionalArgument(argParserData *data, char *longArgumentName, char *shor
     }
 
     /* Create the required argument properly */
-    data->necessaryOptionalArguments[data->necessaryOptionalArgumentsIndex] = HOLIDAY__createNecessaryOptionalArgument(data, longArgumentName, shortArgumentName, needValue, helpMessage, isRequired);
+    HOLIDAY__appendOptionalArgument(data, HOLIDAY__createNecessaryOptionalArgument(data, longArgumentName, shortArgumentName, needValue, helpMessage, isRequired));
     data->necessaryOptionalArgumentsIndex += 1;
 }
 
@@ -97,8 +97,8 @@ int HOLIDAY__checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *
 }
 
 /* Function to make the argument creation most easy */
-HOLIDAY__neededOptionalArgument HOLIDAY__createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired){
-    HOLIDAY__neededOptionalArgument argument;
+HOLIDAY__neededOptionalArgumentListCell HOLIDAY__createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired){
+    HOLIDAY__neededOptionalArgumentListCell argument;
     argument.needValue = needValue;
     argument.isRequired = isRequired;
 

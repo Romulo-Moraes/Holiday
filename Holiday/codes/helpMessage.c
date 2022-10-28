@@ -1,22 +1,30 @@
 #include "./../Holiday.h"
 
 void HOLIDAY__showHelpMessage(argParserData *data, int exitCode){
+    HOLIDAY__neededPositionalArgumentListCell *requiredPositionalArgumentsPointerCopy = data->necessaryPositionalArguments;
+    HOLIDAY__neededOptionalArgumentListCell * optionalArgumentsPointerCopy = data->necessaryOptionalArguments;
     int programAboutLength = strlen(data->programAbout);
 
-    printf("%s --> How to use the program\n\n", strlen(data->programName) > 0 ? data->programName : data->argv[0]);
-
-    printf("%s %s%s\n", strlen(data->programName) > 0 ? data->programName : data->argv[0], data->necessaryPositionalArgumentsIndex > 0 ? "<[Positional arguments]> " : " ", data->necessaryOptionalArgumentsIndex > 0 ? "--<[Optional argument]> or -<[Short optional argument]> <[Short optional argument value]>" : "");
-
     if(programAboutLength > 0){
-        printf("About: %s\n\n", data->programAbout);
+        printf("%s\n\n", data->programAbout);
     }
 
-    for(int i = 0; i < data->necessaryPositionalArgumentsIndex; i++){
-        printf("%s --> %s (required)\n", data->necessaryPositionalArguments[i].argumentID, data->necessaryPositionalArguments[i].helpMessage);
+    //printf("%s --> How to use the program\n\n", strlen(data->programName) > 0 ? data->programName : data->argv[0]);
+    printf("Usage: %s [OPTIONS]\n\n", data->programName);
+
+    //printf("%s %s%s\n", strlen(data->programName) > 0 ? data->programName : data->argv[0], data->necessaryPositionalArgumentsIndex > 0 ? "<[Positional arguments]> " : " ", data->necessaryOptionalArgumentsIndex > 0 ? "--<[Optional argument]> or -<[Short optional argument]> <[Short optional argument value]>" : "");
+
+    printf("Options:\n");
+    while(requiredPositionalArgumentsPointerCopy != NULL){
+        printf("\t%s --> %s (required)\n", requiredPositionalArgumentsPointerCopy->argumentID, requiredPositionalArgumentsPointerCopy->helpMessage);
+        requiredPositionalArgumentsPointerCopy = requiredPositionalArgumentsPointerCopy->next;
     }
 
-    for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
-        printf("%s / %s --> %s %s\n", data->necessaryOptionalArguments[i].longArgumentName, data->necessaryOptionalArguments[i].shortArgumentName, data->necessaryOptionalArguments[i].helpMessage, data->necessaryOptionalArguments[i].isRequired ? "(required)" : "");
+    puts("");
+
+    while(optionalArgumentsPointerCopy != NULL){
+        printf("\t%s / %s --> %s %s\n", optionalArgumentsPointerCopy->longArgumentName, optionalArgumentsPointerCopy->shortArgumentName, optionalArgumentsPointerCopy->helpMessage, optionalArgumentsPointerCopy->isRequired ? "(required)" : "");
+        optionalArgumentsPointerCopy = optionalArgumentsPointerCopy->next;
     }
 
     puts("\nEnd of help message");  

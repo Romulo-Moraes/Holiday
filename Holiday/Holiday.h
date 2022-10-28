@@ -24,43 +24,47 @@ typedef struct{
 } names;
 
 /* This struct will store all arguments that are collected from argv after processed, it is for optional type*/
-typedef struct{
+typedef struct collectedOptionalArgument{
     int needValue;
     char longArgumentName[DEFAULT_ARRAY_SIZE];
     char shortArgumentName[3];
     char *value;
-} HOLIDAY__collectedOptionalArgument;
+    struct collectedOptionalArgument *next;
+} HOLIDAY__collectedOptionalArgumentListCell;
 
 /* This struct will store all arguments that are collected from argv after processed, it is for positional type*/
-typedef struct{
+typedef struct collectedPositionArgument{
     char argumentID[DEFAULT_ARRAY_SIZE];
     char *value;
-} HOLIDAY__collectedPositionalArgument;
+    struct collectedPositionArgument *next;
+} HOLIDAY__collectedPositionalArgumentListCell;
 
 /* This struct is used to store all information that addOptionalArgument function will get */
-typedef struct{
+typedef struct neededOptionalArgument{
     char longArgumentName[DEFAULT_ARRAY_SIZE];
     char shortArgumentName[3];
     int needValue;
     int isRequired;
     char helpMessage[DEFAULT_ARRAY_SIZE];
-} HOLIDAY__neededOptionalArgument;
+    struct neededOptionalArgument *next;
+} HOLIDAY__neededOptionalArgumentListCell;
 
 /* This struct is used to store all information that addPositionalArgument function will get */
-typedef struct{
+typedef struct neededPositionalArgument{
     char argumentID[DEFAULT_ARRAY_SIZE];
     char helpMessage[DEFAULT_ARRAY_SIZE];
-} HOLIDAY__neededPositionalArgument;
+    struct neededPositionalArgument *next;
+} HOLIDAY__neededPositionalArgumentListCell;
 
 typedef struct{
     int argc;
     char **argv;
     char programName[DEFAULT_ARRAY_SIZE];
     char programAbout[DEFAULT_ARRAY_SIZE];  
-    HOLIDAY__neededPositionalArgument necessaryPositionalArguments[DEFAULT_ARRAY_SIZE];
-    HOLIDAY__neededOptionalArgument necessaryOptionalArguments[DEFAULT_ARRAY_SIZE];
-    HOLIDAY__collectedOptionalArgument allCollectedOptionalArguments[DEFAULT_ARRAY_SIZE];
-    HOLIDAY__collectedPositionalArgument allCollectedPositionalArguments[DEFAULT_ARRAY_SIZE];
+    HOLIDAY__neededPositionalArgumentListCell *necessaryPositionalArguments;
+    HOLIDAY__neededOptionalArgumentListCell *necessaryOptionalArguments;
+    HOLIDAY__collectedOptionalArgumentListCell *allCollectedOptionalArguments;
+    HOLIDAY__collectedPositionalArgumentListCell *allCollectedPositionalArguments;
     int necessaryPositionalArgumentsIndex;
     int necessaryOptionalArgumentsIndex;
     int allCollectedOptionalArgumentsIndex;
@@ -77,6 +81,7 @@ void parseArguments(argParserData *data, int possibleErrorCode);
 int optionalWasSet(argParserData *data, char *argumentName);
 char* getOptionalArgumentValue(argParserData *data, char *argumentName);
 char* getPositionalArgumentValue(argParserData *data, char *argumentID);
+void destroyHoliday(argParserData *data);
 
 int HOLIDAY__checkIfArgumentIsNumeric(char *argument);
 int HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(argParserData *data);
@@ -87,14 +92,25 @@ int HOLIDAY__checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *
 int HOLIDAY__checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *argumentName);
 char HOLIDAY__createNewShortArgumentName(argParserData *data);
 int HOLIDAY__pickupAllPositionalArguments(argParserData *data);
-void HOLIDAY__addPositionalArgumentInArray(argParserData *data, int *allCollectedPositionalArgumentBegin, int i);
 int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition);
 int HOLIDAY__checkIfOptionalArgumentIsRequired(argParserData *data, char *argument);
 int HOLIDAY__checkIfOptionalArgumentNeedValue(argParserData *data, char *argument);
 names HOLIDAY__getOppositeSizeOfArgumentName(argParserData *data, char *argumentName);
 int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition);
-HOLIDAY__neededPositionalArgument HOLIDAY__createNecessaryPositionalArgument(char *argumentID, char *helpMessage);
-HOLIDAY__neededOptionalArgument HOLIDAY__createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
+HOLIDAY__neededPositionalArgumentListCell HOLIDAY__createNecessaryPositionalArgument(char *argumentID, char *helpMessage);
+HOLIDAY__neededOptionalArgumentListCell HOLIDAY__createNecessaryOptionalArgument(argParserData *data, char *longArgumentName, char *shortArgumentName, int needValue, char *helpMessage, int isRequired);
 int HOLIDAY__dashesChecking(char *argument, int isLongArgumentName, int *dashesInBeginOutput);
 int HOLIDAY__retrieveArgumentNameSize(char *argument);
 void HOLIDAY__checkDashesInStringBeginning(char *buffer);
+void HOLIDAY__appendOptionalArgument(argParserData *data, HOLIDAY__neededOptionalArgumentListCell newNecessaryArgument);
+void HOLIDAY__appendPositionalArgument(argParserData *data, HOLIDAY__neededPositionalArgumentListCell newNecessaryArgument);
+void HOLIDAY__appendCollectedOptionalArgument(argParserData *data, HOLIDAY__collectedOptionalArgumentListCell newArgument);
+void HOLIDAY__appendCollectedPositional(argParserData *data, int *allCollectedPositionalArgumentBegin, int i);
+void HOLIDAY__destroyNeededPositionalArguments(HOLIDAY__neededPositionalArgumentListCell **theArgumentList);
+void HOLIDAY__destroyNeededOptionalArguments(HOLIDAY__neededOptionalArgumentListCell **theArgumentList);
+void HOLIDAY__destroyCollectedPositionalArguments(HOLIDAY__collectedPositionalArgumentListCell **theArgumentList);
+void HOLIDAY__destroyCollectedOptionalArguments(HOLIDAY__collectedOptionalArgumentListCell **theArgumentList);
+HOLIDAY__neededOptionalArgumentListCell *HOLIDAY__searchNeededOptionalValueInList(char fullName[128], char shortName[3], HOLIDAY__neededOptionalArgumentListCell *neededList);
+HOLIDAY__neededPositionalArgumentListCell *HOLIDAY__searchNeededPositionalValueInListByIndex(int index, HOLIDAY__neededPositionalArgumentListCell *neededList);
+HOLIDAY__collectedOptionalArgumentListCell *HOLIDAY__searchCollectedOptionalValueInList(char *argumentName, HOLIDAY__collectedOptionalArgumentListCell *collectedArgumentList);
+HOLIDAY__collectedPositionalArgumentListCell *HOLIDAY__searchCollectedPositionalValueInList(char *argumentName, HOLIDAY__collectedPositionalArgumentListCell *collectedArgumentList);

@@ -16,13 +16,13 @@ void addPositionalArgument(argParserData *data, char *argumentID, char *helpMess
         exit(DEBUG_ERROR_CODE);
     }
 
-    data->necessaryPositionalArguments[data->necessaryPositionalArgumentsIndex] = HOLIDAY__createNecessaryPositionalArgument(argumentID, helpMessage);
+    HOLIDAY__appendPositionalArgument(data, HOLIDAY__createNecessaryPositionalArgument(argumentID, helpMessage));
     data->necessaryPositionalArgumentsIndex += 1;
 }
 
 /* This function help to create a positional argument requirement most easier */
-HOLIDAY__neededPositionalArgument HOLIDAY__createNecessaryPositionalArgument(char *argumentID, char *helpMessage){
-    HOLIDAY__neededPositionalArgument argument;
+HOLIDAY__neededPositionalArgumentListCell HOLIDAY__createNecessaryPositionalArgument(char *argumentID, char *helpMessage){
+    HOLIDAY__neededPositionalArgumentListCell argument;
 
     strcpy(argument.argumentID, argumentID);    
     strcpy(argument.helpMessage, helpMessage);

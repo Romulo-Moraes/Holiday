@@ -8,10 +8,11 @@ argParserData argParserInit(int argc, char *argv[], char *programName, char *pro
     data.argv = argv;
 
     memset(data.programName, '\0', sizeof(data.programName));
-    memset(data.necessaryOptionalArguments, '\0', sizeof(data.necessaryOptionalArguments));
-    memset(data.necessaryPositionalArguments, '\0', sizeof(data.necessaryPositionalArguments));
-    memset(data.allCollectedOptionalArguments, '\0', sizeof(data.allCollectedOptionalArguments));
-    memset(data.allCollectedPositionalArguments, '\0', sizeof(data.allCollectedPositionalArguments));
+
+    data.necessaryOptionalArguments = NULL;
+    data.necessaryPositionalArguments = NULL;
+    data.allCollectedOptionalArguments = NULL;
+    data.allCollectedPositionalArguments = NULL;
 
     data.necessaryOptionalArgumentsIndex = 0;
     data.allCollectedOptionalArgumentsIndex = 0;

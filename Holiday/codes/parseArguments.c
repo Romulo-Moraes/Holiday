@@ -25,21 +25,21 @@ void parseArguments(argParserData *data, int possibleErrorCode){
 
 int HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(argParserData *data){
     int found = FALSE;
+    HOLIDAY__collectedOptionalArgumentListCell *q = data->allCollectedOptionalArguments;
 
     /* The strategy here is run the collected array and compare if each element exists in the necessary array */
     for(int i = 0; i < data->allCollectedOptionalArgumentsIndex; i++){
-        for(int j = 0; j < data->necessaryOptionalArgumentsIndex; j++){
-            if(strcmp(data->necessaryOptionalArguments[j].longArgumentName, data->allCollectedOptionalArguments[i].longArgumentName) == 0 || strcmp(data->necessaryOptionalArguments[j].shortArgumentName, data->allCollectedOptionalArguments[i].shortArgumentName) == 0){
-                found = TRUE;
-            }
-        }
-
-        if(found == TRUE){
-            found == FALSE;
-        }
-        else{
+        if(HOLIDAY__searchNeededOptionalValueInList(q->longArgumentName, q->shortArgumentName, data->necessaryOptionalArguments) == NULL){
             return TRUE;
         }
+        else{
+            q = q->next;
+        }
+        /*
+        if(strcmp(data->necessaryOptionalArguments[j].longArgumentName, data->allCollectedOptionalArguments[i].longArgumentName) == 0 || strcmp(data->necessaryOptionalArguments[j].shortArgumentName, data->allCollectedOptionalArguments[i].shortArgumentName) == 0){
+            found = TRUE;
+        }
+        */
     }
 
     return FALSE;
@@ -50,32 +50,41 @@ int HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *
         return TRUE;
     }
     
-
     return FALSE;
 }
 
 int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data){
     int found = FALSE;
+    HOLIDAY__neededOptionalArgumentListCell *q = data->necessaryOptionalArguments;
+    HOLIDAY__collectedOptionalArgumentListCell *p;
 
     /* The strategy here is run the necessary array and compare if each element exists in collected array */
     for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
-
-        if(data->necessaryOptionalArguments[i].isRequired == TRUE){
-
+        p = data->allCollectedOptionalArguments;
+        if(q->isRequired == TRUE){
             for(int j = 0; j < data->allCollectedOptionalArgumentsIndex; j++){
-
-                if(strcmp(data->allCollectedOptionalArguments[j].longArgumentName, data->necessaryOptionalArguments[i].longArgumentName) == 0 || strcmp(data->allCollectedOptionalArguments[j].shortArgumentName, data->necessaryOptionalArguments[i].shortArgumentName) == 0){
+                if(strcmp(p->longArgumentName, q->longArgumentName) == 0 || strcmp(p->shortArgumentName, q->shortArgumentName) == 0){
                     found = TRUE;
                 }
             }
 
+            if(found == FALSE){
+                return FALSE;
+            }
+            else{
+                found = FALSE;
+            }
+            /*
             if(found == TRUE){
                 found = FALSE;
             }
             else{
                 return FALSE;
             }
+            */
         }
+
+        q = q->next;
     }
 
     return TRUE;
@@ -117,7 +126,7 @@ int HOLIDAY__pickupAllPositionalArguments(argParserData *data){
             else{
 
                 /* If no one of options above was triggered, then the current argument is positional */
-                HOLIDAY__addPositionalArgumentInArray(data, &allCollectedPositionalArgumentBegin, i);
+                HOLIDAY__appendCollectedPositional(data, &allCollectedPositionalArgumentBegin, i);
             }
         }
     }
@@ -125,19 +134,13 @@ int HOLIDAY__pickupAllPositionalArguments(argParserData *data){
     return 0;
 }
 
-void HOLIDAY__addPositionalArgumentInArray(argParserData *data, int *allCollectedPositionalArgumentBegin, int i){
-    strcpy(data->allCollectedPositionalArguments[*allCollectedPositionalArgumentBegin].argumentID, data->necessaryPositionalArguments[*allCollectedPositionalArgumentBegin].argumentID);
 
-    data->allCollectedPositionalArguments[*allCollectedPositionalArgumentBegin].value = data->argv[i];
-
-    *allCollectedPositionalArgumentBegin += 1;
-    data->allCollectedPositionalArgumentsIndex += 1;
-}
 
 /* This function will load everything that is long argument from argv, right into allCollectedOptionalArguments array.
    This version is for short argument name */
 int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
     names argumentNames;
+    HOLIDAY__collectedOptionalArgumentListCell newCollectedOptionalArgument;
     char bufferOfFormat[3] = {0};
     int currentArgvPosition = *argvPosition;
 
@@ -154,8 +157,8 @@ int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition)
                         /* -1 represent the last char of string*/
                         if(j == strlen(data->argv[currentArgvPosition]) - 1){
                             if(currentArgvPosition + 1 < data->argc){
-                                data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].needValue = TRUE;
-                                data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].value = data->argv[currentArgvPosition + 1];
+                                newCollectedOptionalArgument.needValue = TRUE;
+                                newCollectedOptionalArgument.value = data->argv[currentArgvPosition + 1];
 
                                 /* This addition will be added to the addition right down here to jump through the optional value */
                                 *argvPosition += 1;
@@ -171,12 +174,13 @@ int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition)
 
                     argumentNames = HOLIDAY__getOppositeSizeOfArgumentName(data, bufferOfFormat);
 
-                    strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].longArgumentName, argumentNames.longArgumentName);
-                    strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].shortArgumentName, argumentNames.shortArgumentName);
+                    strcpy(newCollectedOptionalArgument.longArgumentName, argumentNames.longArgumentName);
+                    strcpy(newCollectedOptionalArgument.shortArgumentName, argumentNames.shortArgumentName);
+
+                    HOLIDAY__appendCollectedOptionalArgument(data, newCollectedOptionalArgument);
 
                     data->allCollectedOptionalArgumentsIndex += 1;
                     *argvPosition += 1;
-
                 }
                 else{
                     return ARGUMENT_NOT_REQUIRED;
@@ -209,18 +213,11 @@ int HOLIDAY__checkIfArgumentIsNumeric(char *argument){
 
 
 
-
-
-
-
-
-
-
-
 /* This function will load everything that is long argument from argv, right into allCollectedOptionalArguments array.
    This version is for long argument name */
 int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
     names argumentNames;
+    HOLIDAY__collectedOptionalArgumentListCell newCollectedOptionalArgument;
     int currentArgvPosition = *argvPosition;
 
     /* Run through the whole argv to try find long arguments */
@@ -234,8 +231,8 @@ int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
             /* Checking if the found argument need a value with it */
             if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, data->argv[currentArgvPosition]) == TRUE){
                 if(currentArgvPosition + 1 < data->argc){
-                    data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].needValue = TRUE;
-                    data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].value = data->argv[currentArgvPosition + 1];
+                    newCollectedOptionalArgument.needValue = TRUE;
+                    newCollectedOptionalArgument.value = data->argv[currentArgvPosition + 1];
 
                     /* This addition will be added to the addition right down here to jump through the optional value */
                     *argvPosition += 1;
@@ -247,8 +244,10 @@ int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
 
             argumentNames = HOLIDAY__getOppositeSizeOfArgumentName(data, data->argv[currentArgvPosition]);
                 
-            strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].longArgumentName, argumentNames.longArgumentName);
-            strcpy(data->allCollectedOptionalArguments[data->allCollectedOptionalArgumentsIndex].shortArgumentName, argumentNames.shortArgumentName);
+            strcpy(newCollectedOptionalArgument.longArgumentName, argumentNames.longArgumentName);
+            strcpy(newCollectedOptionalArgument.shortArgumentName, argumentNames.shortArgumentName);
+
+            HOLIDAY__appendCollectedOptionalArgument(data, newCollectedOptionalArgument);
 
             data->allCollectedOptionalArgumentsIndex += 1;
             *argvPosition += 1;
