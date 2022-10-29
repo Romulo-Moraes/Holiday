@@ -39,7 +39,10 @@ int parseArguments(argParserData *data){
         }
     }
 
-    HOLIDAY__pickupAllPositionalArguments(data, &heapAllocationStatus);
+    if(HOLIDAY__pickupAllPositionalArguments(data, &heapAllocationStatus) != 0){
+        HOLIDAY__showHelpMessage(data);
+    }   
+
     if(heapAllocationStatus == HEAP_REQUEST_FAULT){
         if(data->notifyOnMemoryFault == TRUE){
             return HEAP_REQUEST_FAULT;
@@ -120,7 +123,6 @@ int HOLIDAY__pickupAllPositionalArguments(argParserData *data, int *heapAllocati
     char bufferOfFormat[3] = {0};
     int allCollectedPositionalArgumentBegin = 0;
 
-
     /* Loop to run through the entire argv to find all positional arguments */
     for(int i = 1; i < data->argc; i++){
 
@@ -135,22 +137,25 @@ int HOLIDAY__pickupAllPositionalArguments(argParserData *data, int *heapAllocati
             }
         }
         else{
-
             /* Check if the current argument is a short argument block */
             if(data->argv[i][0] == '-' && strncmp(data->argv[i], "--", 2) != 0 && HOLIDAY__checkIfArgumentIsNumeric(&data->argv[i][1]) == FALSE){
                 sprintf(bufferOfFormat, "-%c", data->argv[i][strlen(data->argv[i]) - 1]);
 
                 /* Checking if the last flg of this block need a value */
                 if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
-
                     /* Advance the argv index to next position that will be advanced by the for loop too */
                     i += 1;
                 }
             }
             else{
-
-                /* If no one of options above was triggered, then the current argument is positional */
-                *heapAllocationStatus = HOLIDAY__appendCollectedPositional(data, &allCollectedPositionalArgumentBegin, i);
+                // Checking if the user isn't passing more positional arguments than necessary
+                if(allCollectedPositionalArgumentBegin < data->necessaryPositionalArgumentsIndex){
+                    /* If no one of options above was triggered, then the current argument is positional */
+                    *heapAllocationStatus = HOLIDAY__appendCollectedPositional(data, &allCollectedPositionalArgumentBegin, i);
+                }
+                else{
+                    return PASSED_MORE_POSITIONAL_ARGUMENT_THAN_NECESSARY;
+                }
             }
         }
     }
@@ -163,7 +168,7 @@ int HOLIDAY__pickupAllPositionalArguments(argParserData *data, int *heapAllocati
 /* This function will load everything that is long argument from argv, right into allCollectedOptionalArguments array.
    This version is for short argument name */
 int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition, int *heapAllocationStatus){
-    int alreadyJumpedToTwoDashesArgument = FALSE;
+    int alreadyJumpedToTwoDashesArgument = FALSE, alreadyJumpedToShortArgumentBlock = FALSE;
     names argumentNames;
     HOLIDAY__collectedOptionalArgumentListCell newCollectedOptionalArgument;
     char bufferOfFormat[3] = {0};
@@ -180,7 +185,6 @@ int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition,
                 sprintf(bufferOfFormat, "-%c", data->argv[currentArgvPosition][j]);
                 if(HOLIDAY__checkIfOptionalArgumentIsRequired(data, bufferOfFormat) == TRUE){
                     if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
-
                         /* -1 represent the last char of string*/
                         if(j == strlen(data->argv[currentArgvPosition]) - 1){
                             if(currentArgvPosition + 1 < data->argc){
@@ -212,9 +216,20 @@ int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition,
                     // reached the last flag of short argument block
                     if(j == currentArgumentSize - 1){
                         *argvPosition += 1;
+                        
+                        /*
+                        alreadyJumpedToShortArgumentBlock = strncmp(data->argv[*argvPosition], "--", 2) != 0 && data->argv[*argvPosition][0] == '-' ? TRUE : FALSE;
+                        */
+
+                        if(data->argv[*argvPosition] != NULL){
+                            alreadyJumpedToTwoDashesArgument = strncmp(data->argv[*argvPosition], "--", 2) == 0 ? TRUE : FALSE;
+                            alreadyJumpedToShortArgumentBlock = strncmp(data->argv[*argvPosition], "--", 2) != 0 && strncmp(data->argv[*argvPosition], "-", 1) == 0 ? TRUE : FALSE;
+                        }
+                        else{
+                            return 0;
+                        }
                     }
 
-                    alreadyJumpedToTwoDashesArgument = strncmp(data->argv[*argvPosition], "--", 2) == 0 ? TRUE : FALSE;
                 }
                 else{
                     return ARGUMENT_NOT_REQUIRED;
@@ -224,7 +239,7 @@ int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition,
 
     }
 
-    if(strncmp(data->argv[currentArgvPosition], "--", 2) != 0 && alreadyJumpedToTwoDashesArgument == FALSE){
+    if(strncmp(data->argv[currentArgvPosition], "--", 2) != 0 && alreadyJumpedToTwoDashesArgument == FALSE && alreadyJumpedToShortArgumentBlock == FALSE /* || alreadyJumpedToShortArgumentBlock == FALSE*/){
         *argvPosition += 1;
     }
 
@@ -255,8 +270,10 @@ int HOLIDAY__checkIfArgumentIsNumeric(char *argument){
 int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition, int *heapAllocationStatus){
     names argumentNames;
     HOLIDAY__collectedOptionalArgumentListCell newCollectedOptionalArgument;
-    memset(&newCollectedOptionalArgument, '\0', sizeof(HOLIDAY__collectedOptionalArgumentListCell));
     int currentArgvPosition = *argvPosition;
+
+    memset(&newCollectedOptionalArgument, '\0', sizeof(HOLIDAY__collectedOptionalArgumentListCell));
+    newCollectedOptionalArgument.value = NULL;
 
     /* Run through the whole argv to try find long arguments */
 
