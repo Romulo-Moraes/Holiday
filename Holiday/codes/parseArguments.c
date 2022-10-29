@@ -50,24 +50,6 @@ int parseArguments(argParserData *data){
         }
     }
 
-    /*
-    if(HOLIDAY__checkIfAllRequiredArgumentsWereGiven(data) == 0){
-        puts("here1");
-        exit(0);
-    }
-
-    if(HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0){
-        puts("here2");
-        exit(0);
-    }
-
-    if(HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
-        puts("here3");
-        exit(0);
-    }
-    */
-
-
     /* This if case is executed in sequence and if any error is reported from any process the program show the help message and exit */
     if(HOLIDAY__checkIfAllRequiredArgumentsWereGiven(data) == 0 || HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
         HOLIDAY__showHelpMessage(data);
@@ -89,11 +71,6 @@ int HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(argParserData *data){
         else{
             q = q->next;
         }
-        /*
-        if(strcmp(data->necessaryOptionalArguments[j].longArgumentName, data->allCollectedOptionalArguments[i].longArgumentName) == 0 || strcmp(data->necessaryOptionalArguments[j].shortArgumentName, data->allCollectedOptionalArguments[i].shortArgumentName) == 0){
-            found = TRUE;
-        }
-        */
     }
 
     return FALSE;
