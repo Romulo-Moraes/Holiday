@@ -25,7 +25,7 @@ int addPositionalArgument(argParserData *data, char *argumentID, char *helpMessa
             return HEAP_REQUEST_FAULT;
         }
         else{
-            puts("[LOG] Program exited due to fail on heap allocation [LOG]");
+            puts(HEAP_ALLOCATION_FAULT_MESSAGE);
             exit(1);
         }
     }

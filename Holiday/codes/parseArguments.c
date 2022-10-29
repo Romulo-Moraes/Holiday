@@ -1,26 +1,88 @@
 #include "./../Holiday.h"
 
-void parseArguments(argParserData *data){
+void printCollectedArguments(argParserData *data){
+    while(data->allCollectedOptionalArguments != NULL){
+        printf("Long: %s\nShort: %s\nValue: %s\n\n", data->allCollectedOptionalArguments->longArgumentName, data->allCollectedOptionalArguments->shortArgumentName, data->allCollectedOptionalArguments->value);
+        data->allCollectedOptionalArguments = data->allCollectedOptionalArguments->next;
+    }
+}
+
+
+int parseArguments(argParserData *data){
     int argvPosition = 1;
+    int heapAllocationStatus = HEAP_REQUEST_FINE;
 
     while(argvPosition < data->argc){
-        if(HOLIDAY__pickupAllLongArgumentNames(data, &argvPosition) == 0){
-            if(argvPosition < data->argc){
-                if(HOLIDAY__pickupAllShortArgumentNames(data, &argvPosition) != 0){
-                    HOLIDAY__showHelpMessage(data);
-                }    
+        if(HOLIDAY__pickupAllLongArgumentNames(data, &argvPosition, &heapAllocationStatus) == 0){
+            if(heapAllocationStatus == HEAP_REQUEST_FINE){
+                if(argvPosition < data->argc){
+                    if(HOLIDAY__pickupAllShortArgumentNames(data, &argvPosition, &heapAllocationStatus) != 0){
+                        HOLIDAY__showHelpMessage(data);
+                    }
+                    else{
+                        if(heapAllocationStatus == HEAP_REQUEST_FAULT){
+                            if(data->notifyOnMemoryFault == TRUE){
+                                return HEAP_REQUEST_FAULT;
+                            }
+                            else{
+                                puts(HEAP_ALLOCATION_FAULT_MESSAGE);
+                                exit(1);
+                            }
+                        }
+                    }
+                }   
             }
-            
+            else{
+                if(data->notifyOnMemoryFault == TRUE){
+                    return HEAP_REQUEST_FAULT;
+                }
+                else{
+                    puts(HEAP_ALLOCATION_FAULT_MESSAGE);
+                    exit(1);
+                }
+            }
         }
         else{
             HOLIDAY__showHelpMessage(data);
         }
     }
 
+    HOLIDAY__pickupAllPositionalArguments(data, &heapAllocationStatus);
+    if(heapAllocationStatus == HEAP_REQUEST_FAULT){
+        if(data->notifyOnMemoryFault == TRUE){
+            return HEAP_REQUEST_FAULT;
+        }
+        else{
+            puts(HEAP_ALLOCATION_FAULT_MESSAGE);
+            exit(1);
+        }
+    }
+
+    /*
+    if(HOLIDAY__checkIfAllRequiredArgumentsWereGiven(data) == 0){
+        puts("here1");
+        exit(0);
+    }
+
+    if(HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0){
+        puts("here2");
+        exit(0);
+    }
+
+    if(HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
+        puts("here3");
+        exit(0);
+    }
+    */
+
+
     /* This if case is executed in sequence and if any error is reported from any process the program show the help message and exit */
-    if(HOLIDAY__pickupAllPositionalArguments(data) != 0 || HOLIDAY__checkIfAllRequiredArgumentsWasGiven(data) == 0 || HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
+    if(HOLIDAY__checkIfAllRequiredArgumentsWereGiven(data) == 0 || HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(data) == 0 || HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(data) != 0){
         HOLIDAY__showHelpMessage(data);
     }
+
+
+    return HEAP_REQUEST_FINE;
 }
 
 int HOLIDAY__checkIfUnknowArgumentsWerePassedToProgram(argParserData *data){
@@ -53,7 +115,7 @@ int HOLIDAY__checkIfCountOfCollectedPositionalArgumentsIsCorrect(argParserData *
     return FALSE;
 }
 
-int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data){
+int HOLIDAY__checkIfAllRequiredArgumentsWereGiven(argParserData *data){
     int found = FALSE;
     HOLIDAY__neededOptionalArgumentListCell *q = data->necessaryOptionalArguments;
     HOLIDAY__collectedOptionalArgumentListCell *p;
@@ -85,7 +147,7 @@ int HOLIDAY__checkIfAllRequiredArgumentsWasGiven(argParserData *data){
 
 /* This function will run through the entire argv and check which argument one is a positional argument,
    but to do that all optional arguments need be verified before */
-int HOLIDAY__pickupAllPositionalArguments(argParserData *data){
+int HOLIDAY__pickupAllPositionalArguments(argParserData *data, int *heapAllocationStatus){
     char bufferOfFormat[3] = {0};
     int allCollectedPositionalArgumentBegin = 0;
 
@@ -119,7 +181,7 @@ int HOLIDAY__pickupAllPositionalArguments(argParserData *data){
             else{
 
                 /* If no one of options above was triggered, then the current argument is positional */
-                HOLIDAY__appendCollectedPositional(data, &allCollectedPositionalArgumentBegin, i);
+                *heapAllocationStatus = HOLIDAY__appendCollectedPositional(data, &allCollectedPositionalArgumentBegin, i);
             }
         }
     }
@@ -131,18 +193,21 @@ int HOLIDAY__pickupAllPositionalArguments(argParserData *data){
 
 /* This function will load everything that is long argument from argv, right into allCollectedOptionalArguments array.
    This version is for short argument name */
-int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition){
+int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition, int *heapAllocationStatus){
+    int alreadyJumpedToTwoDashesArgument = FALSE;
     names argumentNames;
     HOLIDAY__collectedOptionalArgumentListCell newCollectedOptionalArgument;
     char bufferOfFormat[3] = {0};
     int currentArgvPosition = *argvPosition;
+    int currentArgumentSize;
 
     /* Loop to run through the whole argv */
 
     /* If the first char of string is a dash but the two first isn't dashes, then it is a short argument block */
     if(data->argv[currentArgvPosition][0] == '-' && strncmp(data->argv[currentArgvPosition], "--", 2) != 0){
+        currentArgumentSize = strlen(data->argv[currentArgvPosition]);
         if(HOLIDAY__checkIfArgumentIsNumeric(&data->argv[currentArgvPosition][1]) == FALSE){
-            for(int j = 1; j < strlen(data->argv[currentArgvPosition]); j++){
+            for(int j = 1; j < currentArgumentSize; j++){
                 sprintf(bufferOfFormat, "-%c", data->argv[currentArgvPosition][j]);
                 if(HOLIDAY__checkIfOptionalArgumentIsRequired(data, bufferOfFormat) == TRUE){
                     if(HOLIDAY__checkIfOptionalArgumentNeedValue(data, bufferOfFormat) == TRUE){
@@ -170,10 +235,17 @@ int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition)
                     strcpy(newCollectedOptionalArgument.longArgumentName, argumentNames.longArgumentName);
                     strcpy(newCollectedOptionalArgument.shortArgumentName, argumentNames.shortArgumentName);
 
-                    HOLIDAY__appendCollectedOptionalArgument(data, newCollectedOptionalArgument);
+                    *heapAllocationStatus = HOLIDAY__appendCollectedOptionalArgument(data, newCollectedOptionalArgument);
 
                     data->allCollectedOptionalArgumentsIndex += 1;
-                    *argvPosition += 1;
+
+                    // The pointer of current argument in argv can only walk if
+                    // reached the last flag of short argument block
+                    if(j == currentArgumentSize - 1){
+                        *argvPosition += 1;
+                    }
+
+                    alreadyJumpedToTwoDashesArgument = strncmp(data->argv[*argvPosition], "--", 2) == 0 ? TRUE : FALSE;
                 }
                 else{
                     return ARGUMENT_NOT_REQUIRED;
@@ -182,8 +254,11 @@ int HOLIDAY__pickupAllShortArgumentNames(argParserData *data, int *argvPosition)
         }
 
     }
-    
-    *argvPosition += 1;
+
+    if(strncmp(data->argv[currentArgvPosition], "--", 2) != 0 && alreadyJumpedToTwoDashesArgument == FALSE){
+        *argvPosition += 1;
+    }
+
     return 0;
 }
 
@@ -208,9 +283,10 @@ int HOLIDAY__checkIfArgumentIsNumeric(char *argument){
 
 /* This function will load everything that is long argument from argv, right into allCollectedOptionalArguments array.
    This version is for long argument name */
-int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
+int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition, int *heapAllocationStatus){
     names argumentNames;
     HOLIDAY__collectedOptionalArgumentListCell newCollectedOptionalArgument;
+    memset(&newCollectedOptionalArgument, '\0', sizeof(HOLIDAY__collectedOptionalArgumentListCell));
     int currentArgvPosition = *argvPosition;
 
     /* Run through the whole argv to try find long arguments */
@@ -240,7 +316,7 @@ int HOLIDAY__pickupAllLongArgumentNames(argParserData *data, int *argvPosition){
             strcpy(newCollectedOptionalArgument.longArgumentName, argumentNames.longArgumentName);
             strcpy(newCollectedOptionalArgument.shortArgumentName, argumentNames.shortArgumentName);
 
-            HOLIDAY__appendCollectedOptionalArgument(data, newCollectedOptionalArgument);
+            *heapAllocationStatus = HOLIDAY__appendCollectedOptionalArgument(data, newCollectedOptionalArgument);
 
             data->allCollectedOptionalArgumentsIndex += 1;
             *argvPosition += 1;
@@ -263,15 +339,6 @@ names HOLIDAY__getOppositeSizeOfArgumentName(argParserData *data, char *argument
     strcpy(argumentNames.longArgumentName, theArgument->longArgumentName);
     strcpy(argumentNames.shortArgumentName, theArgument->shortArgumentName);
 
-    /*
-    for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
-        if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argumentName) == 0 || strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argumentName) == 0){
-            strcpy(argumentNames.longArgumentName, data->necessaryOptionalArguments[i].longArgumentName);
-            strcpy(argumentNames.shortArgumentName, data->necessaryOptionalArguments[i].shortArgumentName);
-        }
-    }
-    */
-
     return argumentNames;
 }
 
@@ -279,33 +346,11 @@ names HOLIDAY__getOppositeSizeOfArgumentName(argParserData *data, char *argument
 /* This function will check if a optional argument need a value after it */
 int HOLIDAY__checkIfOptionalArgumentNeedValue(argParserData *data, char *argument){
     return HOLIDAY__searchNeededOptionalValueInList(argument,argument, data->necessaryOptionalArguments)->needValue;
-/*
-    for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
-
-        /* It's right that in some time this "if" will be true, but in the end has a return just to compiler be happy 
-        if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argument) == 0 || strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argument) == 0){
-            return data->necessaryOptionalArguments[i].needValue;
-        }
-    }
-
-    return FALSE;
-*/
 }
 
 /* Check if a argument was declared in code, if found in array of necessaries it was declared */
 int HOLIDAY__checkIfOptionalArgumentIsRequired(argParserData *data, char *argument){
     HOLIDAY__neededOptionalArgumentListCell *theArgument = HOLIDAY__searchNeededOptionalValueInList(argument, argument, data->necessaryOptionalArguments);
 
-
     return theArgument == NULL ? FALSE : TRUE;
-
-    /*
-    for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
-        if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argument) == 0 || strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argument) == 0){
-            return TRUE;
-        }
-    }
-    */
-
-    //return FALSE;
 }

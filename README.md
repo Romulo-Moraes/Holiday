@@ -78,7 +78,9 @@ Parsing
 ```c
 // parseArguments(<argParserData>);
 
-parseArguments(&data);
+// This method uses a linked list to store the requested arguments, it always will return a faultAlert to you know if something is wrong in dynamic allocation. You can only handle this value if the 5° argument of argParserInit is TRUE, if not, an exit is called with the message: [LOG] Program exited due to fail on heap allocation [LOG]. If nothing happened wrong then faultAlert = (macro) HEAP_REQUEST_FINE, if not, faultAlert = (macro) HEAP_REQUEST_FAULT. 
+
+int faultAlert = parseArguments(&data);
 ```
 
 Checking if an optional argument was triggered

@@ -58,7 +58,7 @@ int addOptionalArgument(argParserData *data, char *longArgumentName, char *short
             return HEAP_REQUEST_FAULT;
         }
         else{
-            puts("[LOG] Program exited due to fail on heap allocation [LOG]");
+            puts(HEAP_ALLOCATION_FAULT_MESSAGE);
             exit(1);
         }
     }
@@ -89,30 +89,10 @@ char HOLIDAY__createNewShortArgumentName(argParserData *data){
 
 int HOLIDAY__checkIfLongNameArgumentWasAlreadyGiven(argParserData *data, char *argumentName){
     return HOLIDAY__searchNeededOptionalValueInList(argumentName, argumentName, data->necessaryOptionalArguments) == NULL ? FALSE : TRUE;
-
-    /*
-    for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
-        if(strcmp(data->necessaryOptionalArguments[i].longArgumentName, argumentName) == 0){
-            return TRUE;
-        }
-    }
-
-    return FALSE;
-    */
 }
 
 int HOLIDAY__checkIfShortArgumentNameWasAlreadyGiven(argParserData *data, char *argumentName){
     return HOLIDAY__searchNeededOptionalValueInList(argumentName, argumentName, data->necessaryOptionalArguments) == NULL ? FALSE : TRUE;
-
-    /*
-    for(int i = 0; i < data->necessaryOptionalArgumentsIndex; i++){
-        if(strcmp(data->necessaryOptionalArguments[i].shortArgumentName, argumentName) == 0){
-            return TRUE;
-        }
-    }
-
-    return FALSE;
-    */
 }
 
 /* Function to make the argument creation most easy */

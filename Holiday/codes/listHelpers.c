@@ -68,10 +68,11 @@ int HOLIDAY__appendOptionalArgument(argParserData *data, HOLIDAY__neededOptional
 }
 
 
-void HOLIDAY__appendCollectedOptionalArgument(argParserData *data, HOLIDAY__collectedOptionalArgumentListCell newArgument){   
+int HOLIDAY__appendCollectedOptionalArgument(argParserData *data, HOLIDAY__collectedOptionalArgumentListCell newArgument){   
     HOLIDAY__collectedOptionalArgumentListCell *theNewArgument = (HOLIDAY__collectedOptionalArgumentListCell*) malloc(sizeof(HOLIDAY__collectedOptionalArgumentListCell));
     HOLIDAY__collectedOptionalArgumentListCell *p = NULL, *q = NULL;
 
+    
     if(theNewArgument != NULL){
         theNewArgument->needValue = newArgument.needValue;
         strcpy(theNewArgument->longArgumentName, newArgument.longArgumentName);
@@ -93,9 +94,11 @@ void HOLIDAY__appendCollectedOptionalArgument(argParserData *data, HOLIDAY__coll
 
             p->next = theNewArgument;
         }
+
+        return HEAP_REQUEST_FINE;
     }
     else{
-        //TODO!!! (Fail on get heap memory)
+        return HEAP_REQUEST_FAULT;
     }
 }
 
@@ -107,7 +110,7 @@ HOLIDAY__neededPositionalArgumentListCell *HOLIDAY__searchNeededPositionalValueI
     return neededList;
 }
 
-void HOLIDAY__appendCollectedPositional(argParserData *data, int *allCollectedPositionalArgumentBegin, int i){
+int HOLIDAY__appendCollectedPositional(argParserData *data, int *allCollectedPositionalArgumentBegin, int i){
     HOLIDAY__collectedPositionalArgumentListCell *theNewArgument = (HOLIDAY__collectedPositionalArgumentListCell*) malloc(sizeof(HOLIDAY__collectedPositionalArgumentListCell));
     HOLIDAY__collectedPositionalArgumentListCell *p = NULL, *q = NULL;
 
@@ -130,13 +133,15 @@ void HOLIDAY__appendCollectedPositional(argParserData *data, int *allCollectedPo
 
             p->next = theNewArgument;
         }
+
+        *allCollectedPositionalArgumentBegin += 1;
+        data->allCollectedPositionalArgumentsIndex += 1;
+
+        return HEAP_REQUEST_FINE;
     }
     else{
-        //TODO!!! (Fail on get heap memory)
+        return HEAP_REQUEST_FAULT;
     }
-
-    *allCollectedPositionalArgumentBegin += 1;
-    data->allCollectedPositionalArgumentsIndex += 1;
 }
 
 HOLIDAY__neededOptionalArgumentListCell *HOLIDAY__searchNeededOptionalValueInList(char fullName[128], char shortName[3], HOLIDAY__neededOptionalArgumentListCell *neededList){
@@ -151,6 +156,7 @@ HOLIDAY__collectedOptionalArgumentListCell *HOLIDAY__searchCollectedOptionalValu
     while(collectedArgumentList != NULL && strcmp(collectedArgumentList->longArgumentName, argumentName) != 0 && strcmp(collectedArgumentList->shortArgumentName, argumentName) != 0){
         collectedArgumentList = collectedArgumentList->next;
     }
+
 
     return collectedArgumentList;
 }
