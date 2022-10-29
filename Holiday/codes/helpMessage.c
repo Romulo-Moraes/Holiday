@@ -21,7 +21,7 @@ void HOLIDAY__showHelpMessage(argParserData *data){
     puts("");
 
     while(optionalArgumentsPointerCopy != NULL){
-        printf("\t%s / %s --> %s %s\n", optionalArgumentsPointerCopy->longArgumentName, optionalArgumentsPointerCopy->shortArgumentName, optionalArgumentsPointerCopy->helpMessage, optionalArgumentsPointerCopy->isRequired ? "(required)" : "");
+        printf("\t%s / %s %s --> %s %s\n", optionalArgumentsPointerCopy->longArgumentName, optionalArgumentsPointerCopy->shortArgumentName, optionalArgumentsPointerCopy->needValue == TRUE ? "<VALUE>" : "",optionalArgumentsPointerCopy->helpMessage, optionalArgumentsPointerCopy->isRequired ? "(required)" : "");
         optionalArgumentsPointerCopy = optionalArgumentsPointerCopy->next;
     }
 
