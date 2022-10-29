@@ -1,13 +1,5 @@
 #include "./../Holiday.h"
 
-void printCollectedArguments(argParserData *data){
-    while(data->allCollectedOptionalArguments != NULL){
-        printf("Long: %s\nShort: %s\nValue: %s\n\n", data->allCollectedOptionalArguments->longArgumentName, data->allCollectedOptionalArguments->shortArgumentName, data->allCollectedOptionalArguments->value);
-        data->allCollectedOptionalArguments = data->allCollectedOptionalArguments->next;
-    }
-}
-
-
 int parseArguments(argParserData *data){
     int argvPosition = 1;
     int heapAllocationStatus = HEAP_REQUEST_FINE;
